@@ -1,6 +1,6 @@
 # Encoding: utf-8
 name             'pythonstack'
-maintainer       'Rackspace UK, Ltd.'
+maintainer       'Rackspace'
 maintainer_email 'rackspace-cookbooks@rackspace.com'
 license          'Apache 2.0'
 description      'Installs/Configures pythonstack'
