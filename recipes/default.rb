@@ -1,9 +1,9 @@
 # Encoding: utf-8
 #
-# Cookbook Name:: .
+# Cookbook Name:: pythonstack
 # Recipe:: default
 #
-# Copyright 2014, Rackspace
+# Copyright 2014, Rackspace UK, Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
