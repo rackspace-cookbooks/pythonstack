@@ -19,3 +19,8 @@ bin/*
 .coverage/*
 .kitchen/
 .kitchen.local.yml
+.rubocop.yml
+.kitchen.yml
+.gitignore
+.drone.yml
+.gitignore
