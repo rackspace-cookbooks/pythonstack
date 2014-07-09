@@ -19,9 +19,15 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default database::mysql mysql::server mysql-multi::mysql_base).each do |recipe|
+%w(pythonstack::default database::mysql mysql::server mysql-multi).each do |recipe|
   include_recipe recipe
 end
+
+connection_info = {
+  host: 'localhost',
+  username: 'root',
+  password: node['mysql']['server_root_password']
+}
 
 mysql_database_user node['cloud_monitoring']['agent_mysql']['user'] do
   connection connection_info

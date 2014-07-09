@@ -19,7 +19,7 @@
 #
 
 include_recipe 'pythonstack::apache'
-include_recipe 'pythonstack::gluster' if node.deep_fetch['rackspace_gluster']['config']['server']['glusters'].values[0].key?('nodes')
+include_recipe 'git'
 include_recipe 'chef-sugar'
 include_recipe 'python'
 
