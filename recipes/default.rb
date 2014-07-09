@@ -17,3 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+# Include the necessary recipes.
+%w(platformstack::monitors platformstack::iptables apt).each do |recipe|
+  include_recipe recipe
+end
