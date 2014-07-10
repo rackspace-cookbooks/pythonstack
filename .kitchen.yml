@@ -3,13 +3,34 @@ driver:
   name: vagrant
 
 provisioner:
-  name: chef_solo
+  name: chef_zero
+  attributes:
+    platformstack:
+      cloud_backup:
+        enabled: false
+      cloud_monitoring:
+        enabled: false
+    authorization:
+      sudo:
+        users: ['vagrant']
+        passwordless: true
+    rackspace:
+      cloud_credentials:
+        username: 'racker'
+        api_key: 'secret'
+      hybrid_credentials:
+        username: 'racker'
+        api_key: 'secret'
 
 platforms:
   - name: ubuntu-12.04
   - name: centos-6.5
 
+
 suites:
   - name: default
-    run_list: recipe[templatestack]
+    run_list:
+      - recipe[pythonstack::default]
+      - recipe[pythonstack::application_python]
+
     attributes:
