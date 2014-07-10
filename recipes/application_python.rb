@@ -1,7 +1,7 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
-# Recipe:: default
+# Recipe:: application_python
 #
 # Copyright 2014, Rackspace UK, Ltd.
 #
@@ -18,7 +18,20 @@
 # limitations under the License.
 #
 
-# Include the necessary recipes.
-%w(platformstack::monitors platformstack::iptables apt).each do |recipe|
-  include_recipe recipe
+include_recipe 'pythonstack::apache'
+include_recipe 'git'
+include_recipe 'chef-sugar'
+include_recipe 'python'
+
+node['apache']['sites'].each do | site_name |
+  site_name = site_name[0]
+
+  application site_name do
+    path node['apache']['sites'][site_name]['docroot']
+    owner node['apache']['user']
+    group node['apache']['group']
+    deploy_key node['apache']['sites'][site_name]['deploy_key']
+    repository node['apache']['sites'][site_name]['repository']
+    revision node['apache']['sites'][site_name]['revision']
+  end
 end
