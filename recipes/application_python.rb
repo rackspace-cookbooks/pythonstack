@@ -24,6 +24,11 @@ include_recipe 'chef-sugar'
 include_recipe 'python'
 
 python_pip 'flask'
+python_pip 'mysql-connector-python' do
+  options '--allow-external'
+end
+python_pip 'gunicorn'
+python_pip 'MySQL-python'
 
 node['apache']['sites'].each do | site_name |
   site_name = site_name[0]
@@ -36,4 +41,21 @@ node['apache']['sites'].each do | site_name |
     repository node['apache']['sites'][site_name]['repository']
     revision node['apache']['sites'][site_name]['revision']
   end
+end
+
+template "/etc/init/apppy" do
+  source 'init_script.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables({
+    :app_path =>  "#{node['apache']['sites']['example.com']['docroot']}/apppy/flask",
+    :app_name => 'apppy'
+  })
+  action :create
+end
+
+service "apppy" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
 end

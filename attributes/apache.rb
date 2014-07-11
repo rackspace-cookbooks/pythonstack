@@ -19,7 +19,7 @@
 #
 
 site1 = 'example.com'
-version1 = '0.1'
+version1 = '0.2'
 
 node.default['apache']['sites'][site1]['port']         = 80
 node.default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
@@ -33,5 +33,7 @@ node.default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_
 node.default['apache']['sites'][site1]['loglevel']     = 'warn'
 node.default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'
 node.default['apache']['sites'][site1]['revision'] = "v#{version1}"
-node.default['apache']['sites'][site1]['repository'] = 'https://github.com/simo6545/apppy'
+node.default['apache']['sites'][site1]['repository'] = 'https://github.com/siso/apppy'
 node.default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+node.default['apache']['sites'][site1]['app_listen_port']         = 8000
+node.default['apache']['sites'][site1]['app_name']         = 'apppy'
