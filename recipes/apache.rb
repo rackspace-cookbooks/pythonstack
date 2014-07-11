@@ -19,7 +19,7 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default apache2::default apache2::mod_wsgi).each do |recipe|
+%w(pythonstack::default apache2::default apache2::mod_wsgi apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python).each do |recipe|
   include_recipe recipe
 end
 

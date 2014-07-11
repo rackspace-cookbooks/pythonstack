@@ -24,6 +24,19 @@
     Allow from 127.0.0.1
   </Location>
 
+  ProxyPreserveHost on
+  <Proxy *>
+    Order allow,deny
+    Allow from all
+  </Proxy>
+
+  ProxyPass /<%= node['apache']['sites']['example.com']['app_name'] %>/index http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/index
+  ProxyPassReverse /<%= node['apache']['sites']['example.com']['app_name'] %>/index http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/index
+  ProxyPass /<%= node['apache']['sites']['example.com']['app_name'] %>/ip http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/ip
+  ProxyPassReverse /<%= node['apache']['sites']['example.com']['app_name'] %>/ip http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/ip                                                        
+  ProxyPass /<%= node['apache']['sites']['example.com']['app_name'] %>/db http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/db
+  ProxyPassReverse /<%= node['apache']['sites']['example.com']['app_name'] %>/db http://127.0.0.1:<%= node['apache']['sites']['example.com']['app_listen_port'] %>/db                                                        
+
   LogLevel info
   ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-error.log
   CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-access.log combined

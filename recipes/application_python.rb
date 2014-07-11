@@ -23,6 +23,13 @@ include_recipe 'git'
 include_recipe 'chef-sugar'
 include_recipe 'python'
 
+python_pip 'flask'
+python_pip 'mysql-connector-python' do
+  options '--allow-external'
+end
+python_pip 'gunicorn'
+python_pip 'MySQL-python'
+
 node['apache']['sites'].each do | site_name |
   site_name = site_name[0]
 
@@ -33,5 +40,64 @@ node['apache']['sites'].each do | site_name |
     deploy_key node['apache']['sites'][site_name]['deploy_key']
     repository node['apache']['sites'][site_name]['repository']
     revision node['apache']['sites'][site_name]['revision']
+    notifies :restart, 'service[apppy]', :immediately
   end
+end
+
+template "/etc/init.d/apppy" do
+  source 'init_script.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables({
+    :app_path =>  "#{node['apache']['sites']['example.com']['docroot']}/current/apppy/flask",
+    :app_name => 'apppy',
+    :app_user => 'root'
+  })
+  action :create
+end
+
+service "apppy" do
+  supports :status => true, :restart => true
+  action [ :enable, :start ]
+end
+
+mysql_connection_info = {
+  :host     => 'localhost',
+  :username => 'root',
+  :password => node['mysql']['server_root_password']
+}
+
+# Create a mysql database
+mysql_database 'apppy' do
+  connection mysql_connection_info
+  action :create
+end
+
+mysql_database_user 'apppy' do
+  connection mysql_connection_info
+  password   'qwerty'
+  action     :create
+end
+
+mysql_database_user 'apppy' do
+  connection mysql_connection_info
+  database_name 'apppy'
+  host          'localhost'
+  privileges    [:select,:update,:insert,:delete]
+  action        :grant
+end
+
+template "/etc/apppy.conf" do
+  source 'mysql_apppy.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  variables({
+    :db_user =>  'apppy',
+    :db_pass => 'qwerty',
+    :db_host => 'localhost',
+    :db_name => 'apppy'
+  })
+  action :create
 end
