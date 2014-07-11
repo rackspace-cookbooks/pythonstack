@@ -23,6 +23,8 @@ include_recipe 'git'
 include_recipe 'chef-sugar'
 include_recipe 'python'
 
+python_pip 'flask'
+
 node['apache']['sites'].each do | site_name |
   site_name = site_name[0]
 
