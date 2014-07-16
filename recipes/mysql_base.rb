@@ -48,6 +48,7 @@ template 'mysql-monitor' do
 end
 
 # allow the app nodes to connect
-search_add_iptables_rules('recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}", 'INPUT', '-p tcp --dport 3306 -j ACCEPT', 9998, 'allow app nodes to connect')
+search_add_iptables_rules('recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}",
+                          'INPUT', '-p tcp --dport 3306 -j ACCEPT', 9998, 'allow app nodes to connect')
 
 include_recipe 'pythonstack::mysql_holland' if node['mysql']['holland'] == true
