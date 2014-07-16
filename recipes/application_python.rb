@@ -18,9 +18,9 @@
 # limitations under the License.
 #
 
+include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
-include_recipe 'chef-sugar'
 include_recipe 'python'
 
 python_pip 'flask'

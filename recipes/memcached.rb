@@ -19,7 +19,7 @@
 #
 
 # Include the necessary recipes.
-%w( memcached ).each do |recipe|
+%w(pythonstack::default memcached).each do |recipe|
   include_recipe recipe
 end
 
