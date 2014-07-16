@@ -6,7 +6,7 @@
 
 import os 
 import sys 
- 
+
 path = '<%= @path %>/<%= @app_name %>'
 if path not in sys.path: 
     sys.path.insert(0, '<%= @path %>/<%= @app_name %>') 
@@ -14,3 +14,10 @@ if path not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings' 
 import django.core.handlers.wsgi 
 application = django.core.handlers.wsgi.WSGIHandler()
+
+<% if node['newrelic']['application_monitoring']['enabled'] == true -%>
+import newrelic.agent
+newrelic.agent.initialize('/etc/newrelic/newrelic.ini')
+application = newrelic.agent.wsgi_application()(application)
+<% end %>
+
