@@ -28,4 +28,8 @@ python_pip 'python-memcached'
 memcached_node = search('node', 'role:memcached'\
                   " AND chef_environment:#{node.chef_environment}").first
 
-node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+if !memcached_node.nil?
+  node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+else
+  node.set['pythonstack']['memcached']['host'] = nil
+end
