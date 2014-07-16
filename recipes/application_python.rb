@@ -18,10 +18,9 @@
 # limitations under the License.
 #
 
+include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
-include_recipe 'chef-sugar'
-include_recipe 'python'
 
 python_pip 'flask'
 python_pip 'mysql-connector-python' do
@@ -29,3 +28,19 @@ python_pip 'mysql-connector-python' do
 end
 python_pip 'gunicorn'
 python_pip 'MySQL-python'
+
+memcached_node = search('node', 'role:memcached'\
+                  " AND chef_environment:#{node.chef_environment}").first
+if !memcached_node.nil?
+  node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+else
+  node.set['pythonstack']['memcached']['host'] = nil
+end
+
+db_node = search('node', 'role:db'\
+                  " AND chef_environment:#{node.chef_environment}").first
+if db_node.nil?
+  node.set['pythonstack']['database']['host'] = 'localhost'
+else
+  node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
+end
