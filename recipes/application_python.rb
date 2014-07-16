@@ -21,7 +21,6 @@
 include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
-include_recipe 'python'
 
 python_pip 'flask'
 python_pip 'mysql-connector-python' do

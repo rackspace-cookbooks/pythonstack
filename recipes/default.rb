@@ -19,6 +19,6 @@
 #
 
 # Include the necessary recipes.
-%w(platformstack::monitors platformstack::iptables apt chef-sugar).each do |recipe|
+%w(platformstack::monitors platformstack::iptables apt chef-sugar python).each do |recipe|
   include_recipe recipe
 end
