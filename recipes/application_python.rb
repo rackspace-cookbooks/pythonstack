@@ -45,4 +45,4 @@ else
   node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
 end
 
-node.set['newrelic']['application_monitoring']['enabled'] if node['recipes'].include?('newrelic::python-agent')
+node.set['newrelic']['application_monitoring']['enabled'] = 'true' if node['recipes'].include?('newrelic::python-agent')
