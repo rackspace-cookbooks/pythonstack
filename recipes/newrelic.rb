@@ -24,6 +24,8 @@ critical_recipes = [
   'newrelic::python-agent'
 ]
 
+node.set['pythonstack']['newrelic']['application_monitoring'] = 'true'
+
 # Run critical recipes
 critical_recipes.each do | recipe |
   include_recipe recipe
