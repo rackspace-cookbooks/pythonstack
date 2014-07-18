@@ -1,5 +1,4 @@
 # pythonstack Cookbook
--------------------------------
 
 Supported Platforms
 -------------------
