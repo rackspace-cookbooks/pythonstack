@@ -22,9 +22,16 @@ include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 
+case node['platform_family']
+when 'debian'
+  option = '--allow-external'
+when 'rhel'
+  option = ''
+end
+
 python_pip 'flask'
 python_pip 'mysql-connector-python' do
-  options '--allow-external'
+  options option
 end
 python_pip 'gunicorn'
 python_pip 'MySQL-python'
