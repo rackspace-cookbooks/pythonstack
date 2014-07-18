@@ -22,10 +22,10 @@ include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 
-case node["platform_family"]
-when "debian"
+case node['platform_family']
+when 'debian'
   option = '--allow-external'
-when "rhel"
+when 'rhel'
   option = ''
 end
 
