@@ -19,4 +19,3 @@
 #
 
 node.set['pythonstack']['newrelic']['application_monitoring'] = ''
-
