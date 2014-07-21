@@ -36,18 +36,21 @@ end
 python_pip 'gunicorn'
 python_pip 'MySQL-python'
 
-memcached_node = search('node', 'role:memcached'\
-                  " AND chef_environment:#{node.chef_environment}").first
-if !memcached_node.nil?
-  node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+if Chef::Config[:solo]
+  Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
 else
-  node.set['pythonstack']['memcached']['host'] = nil
-end
-
-db_node = search('node', 'role:db'\
+  memcached_node = search('node', 'role:memcached'\
                   " AND chef_environment:#{node.chef_environment}").first
-if db_node.nil?
-  node.set['pythonstack']['database']['host'] = 'localhost'
-else
-  node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
+  if !memcached_node.nil?
+    node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+  else
+    node.set['pythonstack']['memcached']['host'] = nil
+  end
+  db_node = search('node', 'role:db'\
+                  " AND chef_environment:#{node.chef_environment}").first
+  if db_node.nil?
+    node.set['pythonstack']['database']['host'] = 'localhost'
+  else
+    node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
+  end
 end
