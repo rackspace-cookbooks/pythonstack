@@ -26,7 +26,7 @@ case node['platform_family']
 when 'debian'
   option = '--allow-external'
 when 'rhel'
-  option = ''
+  option = '--allow-external'
 end
 
 python_pip 'flask'
