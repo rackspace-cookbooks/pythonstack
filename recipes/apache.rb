@@ -24,37 +24,39 @@
 end
 
 # Create the sites.
-node['apache']['sites'].each do | site_name |
-  site_name = site_name[0]
-  site = node['apache']['sites'][site_name]
+unless node['apache']['sites'].nil?
+  node['apache']['sites'].each do | site_name |
+    site_name = site_name[0]
+    site = node['apache']['sites'][site_name]
 
-  add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site['port']} -j ACCEPT", 100, 'Allow access to apache')
+    add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site['port']} -j ACCEPT", 100, 'Allow access to apache')
 
-  web_app site_name do
-    port site['port']
-    cookbook site['cookbook']
-    template site['template']
-    server_name site['server_name']
-    server_aliases site['server_alias']
-    docroot site['docroot']
-    allow_override site['allow_override']
-    errorlog site['errorlog']
-    customlog site['customlog']
-    loglevel site['loglevel']
-  end
-  template "http-monitor-#{site['server_name']}" do
-    cookbook 'pythonstack'
-    source 'monitoring-remote-http.yaml.erb'
-    path "/etc/rackspace-monitoring-agent.conf.d/#{site['server_name']}-http-monitor.yaml"
-    owner 'root'
-    group 'root'
-    mode '0644'
-    variables(
-      apache_port: site['port'],
-      server_name: site['server_name']
-    )
-    notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
-    action 'create'
-    only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+    web_app site_name do
+      port site['port']
+      cookbook site['cookbook']
+      template site['template']
+      server_name site['server_name']
+      server_aliases site['server_alias']
+      docroot site['docroot']
+      allow_override site['allow_override']
+      errorlog site['errorlog']
+      customlog site['customlog']
+      loglevel site['loglevel']
+    end
+    template "http-monitor-#{site['server_name']}" do
+      cookbook 'pythonstack'
+      source 'monitoring-remote-http.yaml.erb'
+      path "/etc/rackspace-monitoring-agent.conf.d/#{site['server_name']}-http-monitor.yaml"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        apache_port: site['port'],
+        server_name: site['server_name']
+      )
+      notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
+      action 'create'
+      only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+    end
   end
 end
