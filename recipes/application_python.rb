@@ -37,7 +37,7 @@ python_pip 'gunicorn'
 python_pip 'MySQL-python'
 
 if Chef::Config[:solo]
-  Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
+  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
 else
   memcached_node = search('node', 'role:memcached'\
                   " AND chef_environment:#{node.chef_environment}").first
