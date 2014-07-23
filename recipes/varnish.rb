@@ -38,16 +38,18 @@ else
   backend_nodes = search('node', 'recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}")
 end
 backend_nodes.each do |backend_node|
-  node['apache']['sites'].each do |site_name|
-    site_name = site_name[0]
-    site = node['apache']['sites'][site_name]
-    backend_hosts.merge!(
-      "#{best_ip_for(backend_node)}" => {
-        "#{site['port']}" => {
-          "#{site_name}" => "#{site_name}"
+  unless node['apache']['sites'].nil?
+    node['apache']['sites'].each do |site_name|
+      site_name = site_name[0]
+      site = node['apache']['sites'][site_name]
+      backend_hosts.merge!(
+        "#{best_ip_for(backend_node)}" => {
+          "#{site['port']}" => {
+            "#{site_name}" => "#{site_name}"
+          }
         }
-      }
-    )
+      )
+    end
   end
 end
 node.default['pythonstack']['varnish']['backends'] = backend_hosts
