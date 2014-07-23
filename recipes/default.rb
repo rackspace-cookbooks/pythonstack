@@ -26,7 +26,7 @@ when 'debian'
     include_recipe recipe
   end
 when 'rhel'
-  %w(platformstack::monitors platformstack::iptables apt chef-sugar python::package python::pip).each do |recipe|
+  %w(platformstack::monitors platformstack::iptables yum chef-sugar python::package python::pip).each do |recipe|
     include_recipe recipe
   end
   python_pip 'distribute' do
