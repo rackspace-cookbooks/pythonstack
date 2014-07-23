@@ -5,7 +5,7 @@ maintainer_email 'rackspace-cookbooks@rackspace.com'
 license 'Apache 2.0'
 description 'Installs/Configures pythonstack'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.3.4'
+version '0.4.0'
 
 depends 'apache2', '~> 1.10'
 depends 'platformstack'
@@ -19,3 +19,4 @@ depends 'mysql-multi'
 depends 'yum'
 depends 'apt'
 depends 'memcached'
+depends 'varnish'
