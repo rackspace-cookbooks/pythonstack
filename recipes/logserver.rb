@@ -56,5 +56,5 @@ execute 'setup tcp input' do
   command '/root/input.sh'
 end
 
-add_iptables_rule('INPUT', "-p tcp 80 -j ACCEPT", 9996, 'allow http to connect')
+add_iptables_rule('INPUT', "-p tcp --dport 80 -j ACCEPT", 9996, 'allow http to connect')
 
