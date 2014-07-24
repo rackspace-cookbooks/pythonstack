@@ -1,13 +1,13 @@
 #!/bin/bash
 
-GRAYLOG2_URL="http://admin:"$1"@127.0.0.1:12900"
+GRAYLOG2_URL="http://admin:<%= @graylog_admin_pass %>@127.0.0.1:12900"
 
 GRAYLOG2_INPUT_SYSLOG_TCP='
 {
       "global": "true",
       "title": "Syslog TCP",
       "configuration": {
-        "port": $2,
+        "port": <%= @graylog_tcp_inputport %>,
         "bind_address": "0.0.0.0",
         "allow_override_date": true
       },

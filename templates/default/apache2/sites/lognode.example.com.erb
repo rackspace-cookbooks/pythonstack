@@ -6,4 +6,8 @@
   ProxyPass / http://localhost:9000/
   ProxyPreserveHost On
   ProxyPassReverse / http://localhost:9000/
+  <Location />
+    Order allow,deny
+    Allow from all
+  </Location>
 </VirtualHost>
