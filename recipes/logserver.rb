@@ -56,8 +56,8 @@ execute 'setup_tcp_input' do
   command '/root/input.sh'
   not_if do
     loop do
-      if Socket.tcp('127.0.0.1', node['graylog']['tcp_inputport']){}
-        break;
+      if Socket.tcp('127.0.0.1', node['graylog']['tcp_inputport']) {}
+        break
       else
         sleep 10
       end
@@ -65,5 +65,4 @@ execute 'setup_tcp_input' do
   end
 end
 
-add_iptables_rule('INPUT', "-p tcp --dport 80 -j ACCEPT", 9996, 'allow http to connect')
-
+add_iptables_rule('INPUT', '-p tcp --dport 80 -j ACCEPT', 9996, 'allow http to connect')
