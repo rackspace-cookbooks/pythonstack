@@ -19,7 +19,7 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default apache2::default apache2::mod_proxy apache2::mod_proxy_ajp apache2::mod_proxy_balancer apache2::mod_proxy_connect apache2::mod_headers apache2::deflate apache2::mod_proxy_http chef-sugar graylog).each do |recipe|
+%w(pythonstack::default apache2::default apache2::mod_proxy apache2::mod_proxy_ajp apache2::mod_proxy_balancer apache2::mod_proxy_connect apache2::mod_headers apache2::mod_deflate apache2::mod_proxy_http chef-sugar graylog).each do |recipe|
   include_recipe recipe
 end
 
