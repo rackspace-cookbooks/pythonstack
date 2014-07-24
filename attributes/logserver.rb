@@ -21,3 +21,4 @@
 default['graylog']['server']['graylog2.conf']['password_secret'] = 'CHANGEME!'
 default['graylog']['server']['graylog2.conf']['root_password_sha2'] = '90aba6bd1562f5af8f912ac3fe00d9ed7387bd84ec32f3da7415f4078da5efb8'
 default['graylog']['web_interface']['graylog2-web-interface.conf']['application.secret'] = '90aba6bd1562f5af8f912ac3fe00d9ed7387bd84ec32f3da7415f4078da5efb8'
+default['graylog']['tcp_inputport'] = '1506'
