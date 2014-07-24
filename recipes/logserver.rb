@@ -35,7 +35,7 @@ template 'tcp_input' do
   owner 'root'
   group 'root'
   mode '00750'
-  variables (
+  variables(
     graylog_admin_pass: node['graylog']['server']['graylog2.conf']['password_secret'],
     graylog_tcp_inputport: node['graylog']['tcp_inputport']
   )
@@ -53,5 +53,5 @@ package 'curl' do
 end
 
 execute 'setup tcp input' do
-  command "/root/input.sh"
+  command '/root/input.sh'
 end
