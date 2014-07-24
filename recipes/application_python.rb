@@ -26,7 +26,7 @@ case node['platform_family']
 when 'debian'
   option = '--allow-external'
 when 'rhel'
-  option = ''
+  option = '--allow-external'
 end
 
 python_pip 'flask'
@@ -34,7 +34,9 @@ python_pip 'mysql-connector-python' do
   options option
 end
 python_pip 'gunicorn'
-python_pip 'MySQL-python'
+python_pip 'MySQL-python' do
+  options option
+end
 
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')

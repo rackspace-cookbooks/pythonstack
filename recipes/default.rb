@@ -30,7 +30,7 @@ when 'rhel'
     include_recipe recipe
   end
   python_pip 'distribute' do
-    action :install
+    action 'install'
     version '0.6.16'
   end
   include_recipe 'python::virtualenv'
