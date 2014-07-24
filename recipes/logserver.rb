@@ -27,7 +27,7 @@ add_iptables_rule('INPUT', "-p tcp --dport #{node['graylog']['tcp_inputport']} -
 
 template 'tcp_input' do
   cookbook 'pythonstack'
-  source 'apache2/sites/input.sh.erb'
+  source 'input.sh.erb'
   path '/root/input.sh'
   owner 'root'
   group 'root'
@@ -38,7 +38,7 @@ end
 web_app 'lognode.example.com' do
   port '80'
   cookbook 'pythonstack'
-  template 'lognode.example.com.erb'
+  template 'apache2/sites/lognode.example.com.erb'
 end
 
 execute 'setup tcp input' do
