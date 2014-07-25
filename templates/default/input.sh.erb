@@ -1,0 +1,24 @@
+#!/bin/bash
+
+GRAYLOG2_URL="http://admin:<%= @graylog_admin_pass %>@127.0.0.1:12900"
+
+GRAYLOG2_INPUT_SYSLOG_TCP='
+{
+      "global": "true",
+      "title": "Syslog TCP",
+      "configuration": {
+        "port": <%= @graylog_tcp_inputport %>,
+        "bind_address": "0.0.0.0",
+        "allow_override_date": true
+      },
+      "creator_user_id": "admin",
+      "type": "org.graylog2.inputs.syslog.tcp.SyslogTCPInput"
+}'
+
+
+inputs=$(curl -X GET -H "Content-Type: application/json" ${GRAYLOG2_URL}/system/inputs 2>/dev/null)
+
+if [ $(echo $inputs | grep -c "Syslog TCP") != "1" ]; then
+	curl --fail -X POST -H "Content-Type: application/json" -d "${GRAYLOG2_INPUT_SYSLOG_TCP}" ${GRAYLOG2_URL}/system/inputs > /dev/null
+fi
+
