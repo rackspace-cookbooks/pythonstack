@@ -124,43 +124,7 @@ Attributes
 Usage
 -----
 
-#### pythonstack
-
-* single node (app and db) 
-	Include recipe `platformstack::default`, `rackops_rolebook::default`, `pythonstack::mysql_base`, `pythonstack::application_python` in your node's `run_list`:    
-```json
-{
-  "run_list": [
-  "recipe[platformstack::default]",
-  "recipe[rackops_rolebook::default]",
-  "recipe[pythonstack::mysql_base]",
-  "recipe[pythonstack::application_python]
-  ]
-}
-```
-* single app node - standalone db node 
-  DB Node: Include recipe `platformstack::default`, `rackops_rolebook::default`, `pythonstack::mysql_base` in your node's `run_list`:    
-```json
-{
-  "run_list": [
-  "recipe[platformstack::default]",
-  "recipe[rackops_rolebook::default]",
-  "recipe[pythonstack::mysql_base]",
-  "recipe[pythonstack::application_python]
-  ]
-}
-```
-
-  App Node: Include recipe `platformstack::default`, `rackops_rolebook::default`, `pythonstack::application_python` in your node's `run_list`:    
-```json
-{
-  "run_list": [
-  "recipe[platformstack::default]",
-  "recipe[rackops_rolebook::default]",
-  "recipe[pythonstack::application_python]
-  ]
-}
-```
+moved to USAGE.md
 
 
 Contributing
