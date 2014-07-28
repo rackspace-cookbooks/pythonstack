@@ -116,15 +116,22 @@ Attributes
 * default['mysql-multi']['master'] = ''
 * default['mysql-multi']['slaves'] = []
 * default['mysql-multi']['slave_user'] = 'replicant'
+* ['mysql-multi']['server_repl_password'] = ['mysql']['server_repl_password']
 
 #### postgresql.rb
 * default['postgresql']['password']['postgres'] = 'randompasswordforpostgresql'
   * Indicates admin password for postgresql
+* default['pg-multi']['replication']['user'] = 'repl'
+* default['pg-multi']['replication']['password'] = 'useagudpasswd'
+* default['pg-multi']['master_ip'] = ''
+* default['pg-multi']['slave_ip'] = []
+* default['postgresql']['enable_pdgd_yum'] = true  (needed for RedHat Family)
+* default['postgresql']['enable_pdgd_apt'] = true  (needed for Debian Family)
 
 Usage
 -----
 
-moved to USAGE.md
+https://github.com/rackspace-cookbooks/contributing/blob/master/USAGE.md
 
 
 Contributing
