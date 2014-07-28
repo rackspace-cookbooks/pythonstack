@@ -154,7 +154,7 @@ Attributes
 Usage
 -----
 
-https://github.com/rackspace-cookbooks/contributing/blob/master/USAGE.md
+https://github.com/AutomationSupport/pythonstack/blob/master/USAGE.md
 
 
 Contributing
