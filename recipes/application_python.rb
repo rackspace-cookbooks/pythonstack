@@ -30,7 +30,7 @@ python_pip 'mysql-connector-python' do
 end
 python_pip 'gunicorn'
 python_pip 'MySQL-python' do
-  options option
+  options '--allow-external'
 end
 
 if Chef::Config[:solo]
