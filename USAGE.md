@@ -38,7 +38,7 @@
 
 Ensure the following attributes are set within environment or wrapper cookbook.
 
-'''
+'''ruby
 ['mysql']['server_repl_password'] = 'rootlogin'
 ['mysql']['server_repl_password'] = 'replicantlogin'
 ['mysql-multi']['master'] = '1.2.3.4'
@@ -70,7 +70,7 @@ Slave node:
 
 Ensure the following attributes are set within environment or wrapper cookbook.
 
-'''
+```
 ['postgresql']['version'] = '9.3' 
 ['postgresql']['password'] = 'postgresdefault'
 ['pg-multi']['replication']['password'] = 'useagudpasswd'
@@ -80,7 +80,7 @@ Ensure the following attributes are set within environment or wrapper cookbook.
 Depending on OS one of the following two must be set:
 ['postgresql']['enable_pdgd_yum'] = true  (Redhat Family)
 ['postgresql']['enable_pdgd_apt'] = true  (Debian Family)
-'''
+```
 
 Master node:
 ```json
