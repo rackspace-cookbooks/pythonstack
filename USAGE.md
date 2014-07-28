@@ -38,12 +38,13 @@
 
 Ensure the following attributes are set within environment or wrapper cookbook.
 
-'''ruby
+```
 ['mysql']['server_repl_password'] = 'rootlogin'
 ['mysql']['server_repl_password'] = 'replicantlogin'
 ['mysql-multi']['master'] = '1.2.3.4'
 ['mysql-multi']['slaves'] = ['5.6.7.8']
-'''
+```
+
 Master node:
 ```json
 {
