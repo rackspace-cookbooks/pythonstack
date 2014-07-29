@@ -25,6 +25,7 @@ include_recipe 'python'
 
 python_pip 'distribute'
 python_pip 'flask'
+python_pip 'python-memcached'
 python_pip 'mysql-connector-python' do
   options '--allow-external'
 end
