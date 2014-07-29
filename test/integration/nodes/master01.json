@@ -5,13 +5,16 @@
   "automatic": {
     "hostname": "vagrant.vm",
     "recipes": [
-      "phpstack::mysql_master"
+      "pythonstack::mysql_master"
     ],
     "roles": [
       "database_master"
     ]
   },
   "normal": {
+    "tags": {
+      "mysql_master"
+    }
   },
   "chef_type": "node",
   "default": {

@@ -5,13 +5,16 @@
   "automatic": {
     "hostname": "vagrant.vm",
     "recipes": [
-      "phpstack::mysql_slave"
+      "pythonstack::mysql_slave"
     ],
     "roles": [
       "database_slave"
     ]
   },
   "normal": {
+    "tags": {
+      "mysql_slave"
+    }
   },
   "chef_type": "node",
   "default": {
