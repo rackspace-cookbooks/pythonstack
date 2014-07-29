@@ -19,8 +19,8 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default memcached).each do |recipe|
-  include_recipe recipe
-end
+include_recipe 'memcached'
+include_recipe 'python::package'
+include_recipe 'python'
 
 python_pip 'python-memcached'
