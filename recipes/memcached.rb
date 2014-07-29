@@ -23,7 +23,3 @@ if platform_family?('debian')
   include_recipe 'apt'
 end
 include_recipe 'memcached'
-include_recipe 'python::package'
-include_recipe 'python'
-
-python_pip 'python-memcached'
