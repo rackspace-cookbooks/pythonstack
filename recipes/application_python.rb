@@ -45,3 +45,44 @@ end
 
 node.set['pythonstack']['memcached']['host'] = memcached_node.nil? ? nil : best_ip_for(memcached_node)
 node.set['pythonstack']['database']['host'] = db_node.nil? ? 'localhost' : best_ip_for(db_node)
+
+if Chef::Config[:solo]
+  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+  mysql_node = nil
+else
+  mysql_node = search('node', 'recipes:pythonstack\:\:mysql_master' << " AND chef_environment:#{node.chef_environment}").first
+end
+template 'pythonstack.ini' do
+  path '/etc/pythonstack.ini'
+  cookbook node['pythonstack']['ini']['cookbook']
+  source 'pythonstack.ini.erb'
+  owner 'root'
+  group node['apache']['group']
+  mode '00640'
+  variables(
+    cookbook_name: cookbook_name,
+    # if it responds then we will create the config section in the ini file
+    mysql: if mysql_node.respond_to?('deep_fetch')
+             if mysql_node.deep_fetch('apache', 'sites').nil?
+               nil
+             else
+               mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
+             end
+           end
+  )
+  action 'create'
+end
+
+# backups
+node.default['rackspace']['datacenter'] = node['rackspace']['region']
+node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] = 'example@example.com'
+# we will want to change this when https://github.com/rackspace-cookbooks/rackspace_cloudbackup/issues/17 is fixed
+node.default['rackspace_cloudbackup']['backups'] =
+  [
+    {
+      location: node['apache']['docroot_dir'],
+      enable: node['phpstack']['rackspace_cloudbackup']['apache_docroot']['enable'],
+      comment: 'Web Content Backup',
+      cloud: { notify_email: node['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] }
+    }
+  ]
