@@ -19,19 +19,38 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default mysql-multi database::mysql).each do |recipe|
-  include_recipe recipe
-end
+include_recipe 'apt' if node.platform_family?('debian')
+include_recipe 'chef-sugar'
+include_recipe 'database::mysql'
+include_recipe 'platformstack::monitors'
 
 # set passwords dynamically...
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 node.set_unless['pythonstack']['cloud_monitoring']['agent_mysql']['password'] = secure_password
+if node['mysql']['server_root_password'] == 'ilikerandompasswords'
+  node.set['mysql']['server_root_password'] = secure_password
+end
+
+include_recipe 'mysql::server'
+include_recipe 'mysql-multi::mysql_base'
 
 connection_info = {
   host: 'localhost',
   username: 'root',
   password: node['mysql']['server_root_password']
 }
+
+# add holland user (if holland is enabled)
+mysql_database_user 'holland' do
+  connection connection_info
+  password node['holland']['password']
+  host 'localhost'
+  privileges [:usage, :select, :'lock tables', :'show view', :reload, :super, :'replication client']
+  retries 2
+  retry_delay 2
+  action [:create, :grant]
+  only_if { node.deep_fetch('holland', 'enabled') }
+end
 
 mysql_database_user node['pythonstack']['cloud_monitoring']['agent_mysql']['user'] do
   connection connection_info
@@ -54,5 +73,3 @@ end
 
 # allow traffic to mysql port for local addresses only
 add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{node['mysql']['port']} -j ACCEPT", 9999, 'Open port for mysql')
-
-include_recipe 'pythonstack::mysql_holland' if node['mysql']['holland'] == true

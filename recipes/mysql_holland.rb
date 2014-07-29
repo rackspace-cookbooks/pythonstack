@@ -18,16 +18,7 @@
 # limitations under the License.
 #
 
-mysql_database_user 'holland' do
-  connection connection_info
-  password node['holland']['password']
-  host 'localhost'
-  privileges [:usage, :select, :'lock tables', :'show view', :reload, :super, :'replication client']
-  retries 2
-  retry_delay 2
-  action [:create, :grant]
-end
-
+# set repository
 case node['platform_family']
 when 'debian'
   include_recipe 'apt'
@@ -37,7 +28,7 @@ when 'debian'
     components ['./']
     action :add
   end
-when 'centos'
+when 'rhel'
   include_recipe 'yum'
   yum_repository 'Holland' do
     description 'Holland backup repo'

@@ -41,6 +41,8 @@ Creates mysql-monitor template if node[platformstack][cloud_monitoring] = enable
 Creates an iptables rule for application_python nodes in order to connect to this one.
 #### mysql_master
 Runs pythonstack::mysql_base along with mysql-multi::mysql_master recipes
+creates db and associated user per vhost
+use this if you are running on a single node
 #### mysql_slave
 Runs pythonstack::mysql_base along with mysql-multi::mysql_slave recipes
 #### mysql_holland

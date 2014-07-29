@@ -18,19 +18,46 @@ provisioner:
       cloud_credentials:
         username: 'racker'
         api_key: 'secret'
-      hybrid_credentials:
-        username: 'racker'
-        api_key: 'secret'
 
 platforms:
   - name: ubuntu-12.04
+    run_list:
+    - recipe[apt]
   - name: centos-6.5
+    run_list:
+    - recipe[yum]
 
 
 suites:
-  - name: default
+  - name: mysql-master
     run_list:
-      - recipe[pythonstack::default]
-      - recipe[pythonstack::application_python]
-
+      - recipe[pythonstack::mysql_master]
     attributes:
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+      holland:
+        password: "randompass"
+  - name: mysql-slave
+    run_list:
+      - recipe[pythonstack::mysql_slave]
+    attributes:
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+      holland:
+        password: "randompass"
+  - name: application_python
+    run_list:
+      - recipe[pythonstack::application_python]
+      - recipe[pythonstack::mysql_master]
+    attributes:
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+  - name: memcached
+    run_list:
+      - recipe[pythonstack::memcached]

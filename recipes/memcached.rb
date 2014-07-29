@@ -19,8 +19,7 @@
 #
 
 # Include the necessary recipes.
-%w(pythonstack::default memcached).each do |recipe|
-  include_recipe recipe
+if platform_family?('debian')
+  include_recipe 'apt'
 end
-
-python_pip 'python-memcached'
+include_recipe 'memcached'

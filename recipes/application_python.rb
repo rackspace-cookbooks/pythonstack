@@ -18,41 +18,30 @@
 # limitations under the License.
 #
 
-include_recipe 'pythonstack::default'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
+include_recipe 'python::package'
+include_recipe 'python'
 
-case node['platform_family']
-when 'debian'
-  option = '--allow-external'
-when 'rhel'
-  option = '--allow-external'
-end
-
+python_pip 'distribute'
 python_pip 'flask'
+python_pip 'python-memcached'
 python_pip 'mysql-connector-python' do
-  options option
+  options '--allow-external' unless platform_family?('rhel')
 end
 python_pip 'gunicorn'
 python_pip 'MySQL-python' do
-  options option
+  options '--allow-external' unless platform_family?('rhel')
 end
 
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+  memcached_node = nil
+  db_node = nil
 else
-  memcached_node = search('node', 'role:memcached'\
-                  " AND chef_environment:#{node.chef_environment}").first
-  if !memcached_node.nil?
-    node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
-  else
-    node.set['pythonstack']['memcached']['host'] = nil
-  end
-  db_node = search('node', 'role:db'\
-                  " AND chef_environment:#{node.chef_environment}").first
-  if db_node.nil?
-    node.set['pythonstack']['database']['host'] = 'localhost'
-  else
-    node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
-  end
+  memcached_node = search('node', 'role:memcached' << " AND chef_environment:#{node.chef_environment}").first
+  db_node = search('node', 'role:db' << " AND chef_environment:#{node.chef_environment}").first
 end
+
+node.set['pythonstack']['memcached']['host'] = memcached_node.nil? ? nil : best_ip_for(memcached_node)
+node.set['pythonstack']['database']['host'] = db_node.nil? ? 'localhost' : best_ip_for(db_node)
