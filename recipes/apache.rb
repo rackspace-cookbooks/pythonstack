@@ -42,6 +42,7 @@ unless node['apache']['sites'].nil?
       errorlog site['errorlog']
       customlog site['customlog']
       loglevel site['loglevel']
+      script_name site['script_name']
     end
     template "http-monitor-#{site['server_name']}" do
       cookbook 'pythonstack'
