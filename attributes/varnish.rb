@@ -1,7 +1,6 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
-# Recipe:: varnish
 #
 # Copyright 2014, Rackspace UK, Ltd.
 #
