@@ -23,6 +23,10 @@ include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
 
+if platform_family?('debian')
+  package 'python-mysqldb'
+end
+python_pip 'ConfigParser'
 python_pip 'distribute'
 python_pip 'sqlalchemy'
 python_pip 'flask'

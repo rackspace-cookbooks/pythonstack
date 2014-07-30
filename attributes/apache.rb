@@ -19,7 +19,7 @@
 #
 
 site1 = 'example.com'
-version1 = '0.0.4'
+version1 = '0.0.6'
 
 node.default['apache']['sites'][site1]['port']         = 80
 node.default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
