@@ -19,7 +19,8 @@
 #
 
 # Include the necessary recipes.
-%w(platformstack::monitors apt chef-sugar pythonstack::default apache2::default apache2::mod_wsgi apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python).each do |recipe|
+%w(platformstack::monitors platformstack::iptables apt chef-sugar
+   apache2::default apache2::mod_wsgi apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python).each do |recipe|
   include_recipe recipe
 end
 
@@ -42,6 +43,7 @@ unless node['apache']['sites'].nil?
       errorlog site['errorlog']
       customlog site['customlog']
       loglevel site['loglevel']
+      script_name site['script_name']
     end
     template "http-monitor-#{site['server_name']}" do
       cookbook 'pythonstack'
