@@ -19,4 +19,3 @@
 #
 
 default['pythonstack']['varnish']['multi'] = true
-default['varnish']['listen_port'] = 80
