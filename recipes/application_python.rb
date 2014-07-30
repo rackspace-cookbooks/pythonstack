@@ -32,7 +32,6 @@ if platform_family?('rhel')
   package 'mysql'
   package 'mysql-devel'
   include_recipe 'build-essential'
-  python_pip 'mysql-connector-python'
 end
 python_pip 'configparser'
 python_pip 'sqlalchemy'
