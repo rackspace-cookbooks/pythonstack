@@ -37,7 +37,7 @@ if Chef::Config[:solo]
   backend_nodes = nil
 else
   #  backend_nodes = search('node', 'recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}")
-  backend_nodes = search('node', 'tags:application_python' << " AND chef_environment:#{node.chef_environment}")
+  backend_nodes = search('node', 'role:web' << " AND chef_environment:#{node.chef_environment}")
 
 end
 
