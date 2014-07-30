@@ -24,8 +24,8 @@
     Allow from 127.0.0.1
   </Location>
 
-  WSGIDaemonProcess <%= @params[:app_name] %>.localhost python-path=<%= @params[:docroot] %>/current
-  WSGIScriptAlias / <%= @params[:docroot] %>/<%= "#{@params[:app_name]}/" %>current/<%= @params[:script_name] %> process-group=<%= @params[:app_name] %>.localhost
+  WSGIDaemonProcess <%= @params[:server_name] %> python-path=<%= @params[:docroot] %>/current
+  WSGIScriptAlias / <%= @params[:docroot] %>/current/<%= @params[:script_name] %> process-group=<%= @params[:server_name] %>
  
 
   LogLevel info
