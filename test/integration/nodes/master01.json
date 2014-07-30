@@ -12,9 +12,9 @@
     ]
   },
   "normal": {
-    "tags": {
+    "tags": [
       "mysql_master"
-    }
+    ]
   },
   "chef_type": "node",
   "default": {
