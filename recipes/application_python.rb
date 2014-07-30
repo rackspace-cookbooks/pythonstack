@@ -23,6 +23,7 @@ include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
 
+python_pip 'distribute'
 if platform_family?('debian')
   package 'python-mysqldb'
 end
@@ -31,15 +32,12 @@ if platform_family?('rhel')
   package 'mysql'
   package 'mysql-devel'
   include_recipe 'build-essential'
+  python_pip 'mysql-connector-python'
 end
-python_pip 'distribute'
 python_pip 'configparser'
 python_pip 'sqlalchemy'
 python_pip 'flask'
 python_pip 'python-memcached'
-python_pip 'mysql-connector-python' do
-  options '--allow-external' unless platform_family?('debian')
-end
 python_pip 'gunicorn'
 python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
