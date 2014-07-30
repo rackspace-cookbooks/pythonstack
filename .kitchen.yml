@@ -58,6 +58,9 @@ suites:
         server_root_password: "randompass"
         server_repl_password: "randompass"
         server_debian_password: "randompass"
+  - name: varnish
+    run_list:
+      - recipe[pythonstack::varnish]
   - name: memcached
     run_list:
       - recipe[pythonstack::memcached]

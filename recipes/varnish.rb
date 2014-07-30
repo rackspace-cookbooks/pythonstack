@@ -35,11 +35,11 @@ if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
   backend_nodes = nil
 else
-  backend_nodes = search('node', 'role:web' << " AND chef_environment:#{node.chef_environment}")
+  backend_nodes = search('node', 'tags:app_node' << " AND chef_environment:#{node.chef_environment}")
 end
 
 backend_nodes.each do |backend_node|
-  if backend_node['apache']['sites'].nil?
+  if backend_node.deep_fetch('apache', 'sites').nil?
     errmsg = 'Did not find sites, default.vcl not configured'
     Chef::Application.warn(errmsg)
   else
