@@ -32,8 +32,8 @@ if platform_family?('rhel')
   package 'mysql-devel'
   include_recipe 'build-essential'
 end
-python_pip 'configparser'
 python_pip 'distribute'
+python_pip 'configparser'
 python_pip 'sqlalchemy'
 python_pip 'flask'
 python_pip 'python-memcached'
