@@ -42,18 +42,6 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
-if Chef::Config[:solo]
-  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  memcached_node = nil
-  db_node = nil
-else
-  memcached_node = search('node', 'role:memcached' << " AND chef_environment:#{node.chef_environment}").first
-  db_node = search('node', 'role:db' << " AND chef_environment:#{node.chef_environment}").first
-end
-
-node.set['pythonstack']['memcached']['host'] = memcached_node.nil? ? nil : best_ip_for(memcached_node)
-node.set['pythonstack']['database']['host'] = db_node.nil? ? 'localhost' : best_ip_for(db_node)
-
 node['apache']['sites'].each do | site_name |
   site_name = site_name[0]
 
@@ -71,7 +59,7 @@ if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
   mysql_node = nil
 else
-  mysql_node = search('node', 'recipes:pythonstack\:\:mysql_master' << " AND chef_environment:#{node.chef_environment}").first
+  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
 end
 template 'pythonstack.ini' do
   path '/etc/pythonstack.ini'

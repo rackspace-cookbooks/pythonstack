@@ -32,7 +32,7 @@ if node['mysql']['server_root_password'] == 'ilikerandompasswords'
 end
 
 include_recipe 'mysql::server'
-include_recipe 'mysql-multi::mysql_base'
+include_recipe 'mysql-multi'
 
 connection_info = {
   host: 'localhost',
@@ -72,7 +72,11 @@ template 'mysql-monitor' do
 end
 
 # allow traffic to mysql port for local addresses only
-add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{node['mysql']['port']} -j ACCEPT", 9999, 'Open port for mysql')
+search_add_iptables_rules(
+  "tags:python_app_node AND chef_environment:#{node.chef_environment}",
+  'INPUT', "-p tcp --dport #{node['mysql']['port']} -j ACCEPT",
+  9998,
+  'allow app nodes to connect to mysql')
 
 # we don't want to create DBs or users and the like on slaves, do we?
 unless includes_recipe?('phpstack::mysql_slave')
@@ -89,14 +93,7 @@ unless includes_recipe?('phpstack::mysql_slave')
       Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
       app_nodes = []
     else
-      app_nodes = search(:node, 'recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}")
-    end
-
-    if Chef::Config[:solo]
-      Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-      app_nodes = []
-    else
-      app_nodes = search(:node, 'recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}")
+      app_nodes = search(:node, "tags:python_app_node AND chef_environment:#{node.chef_environment}")
     end
 
     app_nodes.each do |app_node|
