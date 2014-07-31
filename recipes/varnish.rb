@@ -1,4 +1,3 @@
-
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
@@ -36,13 +35,14 @@ if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
   backend_nodes = nil
 else
-  #  backend_nodes = search('node', 'recipes:pythonstack\:\:application_python' << " AND chef_environment:#{node.chef_environment}")
-  backend_nodes = search('node', 'role:web' << " AND chef_environment:#{node.chef_environment}")
-
+  backend_nodes = search('node', 'tags:app_node' << " AND chef_environment:#{node.chef_environment}")
 end
 
 backend_nodes.each do |backend_node|
-  if !backend_node['apache']['sites'].nil?
+  if backend_node.deep_fetch('apache', 'sites').nil?
+    errmsg = 'Did not find sites, default.vcl not configured'
+    Chef::Log.warn(errmsg)
+  else
     backend_node['apache']['sites'].each do |site_name|
       site_name = site_name[0]
       site = backend_node['apache']['sites'][site_name]
@@ -54,15 +54,9 @@ backend_nodes.each do |backend_node|
         }
       )
     end
-  else
-    errmsg = 'Did not find sites, default.vcl not configured'
-    Chef::Application.warn(errmsg)
-    # don't fail hard
   end
 end
 
 node.default['pythonstack']['varnish']['backends'] = backend_hosts
 
 include_recipe 'varnish::default'
-
-pp node.default['pythonstack']['varnish']['backends']
