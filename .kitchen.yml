@@ -55,15 +55,22 @@ suites:
   - name: application_python
     run_list:
       - recipe[pythonstack::application_python]
-      - recipe[pythonstack::mysql_master]
-    attributes:
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
   - name: varnish
     run_list:
       - recipe[pythonstack::varnish]
   - name: memcached
     run_list:
       - recipe[pythonstack::memcached]
+  - name: all-in-one
+    run_list:
+      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::memcached]
+      - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::application_python]
+    attributes:
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+      holland:
+        password: "randompass"

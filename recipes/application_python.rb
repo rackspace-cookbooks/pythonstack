@@ -22,16 +22,12 @@ include_recipe 'pythonstack::apache'
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
+include_recipe 'mysql::client'
+include_recipe 'build-essential'
 
 python_pip 'distribute'
 if platform_family?('debian')
   package 'python-mysqldb'
-end
-if platform_family?('rhel')
-  # needed because Mysql-python depends on it
-  package 'mysql'
-  package 'mysql-devel'
-  include_recipe 'build-essential'
 end
 python_pip 'configparser'
 python_pip 'sqlalchemy'
