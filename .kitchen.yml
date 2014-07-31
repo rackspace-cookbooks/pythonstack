@@ -5,6 +5,9 @@ driver:
 provisioner:
   name: chef_zero
   attributes:
+    pythonstack:
+      demo:
+        enabled: true
     platformstack:
       cloud_backup:
         enabled: false
