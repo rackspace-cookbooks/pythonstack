@@ -69,6 +69,6 @@ suites:
   - name: all-in-one
     run_list:
       - recipe[pythonstack::mysql_master]
-      - recipe[pythonstack::application_python]
       - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
+      - recipe[pythonstack::application_python]
