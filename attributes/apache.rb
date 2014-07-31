@@ -18,21 +18,23 @@
 # limitations under the License.
 #
 
-site1 = 'example.com'
-version1 = '0.0.6'
+if node['pythonstack']['pythonstack']['enabled']
+  site1 = 'example.com'
+  version1 = '0.0.6'
 
-node.default['apache']['sites'][site1]['port']         = 80
-node.default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
-node.default['apache']['sites'][site1]['template']     = "apache2/sites/#{site1}.erb"
-node.default['apache']['sites'][site1]['server_name']  = site1
-node.default['apache']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
-node.default['apache']['sites'][site1]['docroot']      = "#{node['apache']['docroot_dir']}/#{site1}"
-node.default['apache']['sites'][site1]['allow_override'] = ['All']
-node.default['apache']['sites'][site1]['errorlog']     = "#{node['apache']['log_dir']}/#{site1}-error.log"
-node.default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_dir']}/#{site1}-access.log combined"
-node.default['apache']['sites'][site1]['loglevel']     = 'warn'
-node.default['apache']['sites'][site1]['script_name']  = 'wsgi.py'
-node.default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'
-node.default['apache']['sites'][site1]['revision'] = "v#{version1}"
-node.default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
-node.default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+  default['apache']['sites'][site1]['port']         = 80
+  default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
+  default['apache']['sites'][site1]['template']     = "apache2/sites/#{site1}.erb"
+  default['apache']['sites'][site1]['server_name']  = site1
+  default['apache']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
+  default['apache']['sites'][site1]['docroot']      = "#{node['apache']['docroot_dir']}/#{site1}"
+  default['apache']['sites'][site1]['allow_override'] = ['All']
+  default['apache']['sites'][site1]['errorlog']     = "#{node['apache']['log_dir']}/#{site1}-error.log"
+  default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_dir']}/#{site1}-access.log combined"
+  default['apache']['sites'][site1]['loglevel']     = 'warn'
+  default['apache']['sites'][site1]['script_name']  = 'wsgi.py'
+  default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'
+  default['apache']['sites'][site1]['revision'] = "v#{version1}"
+  default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
+  default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+end
