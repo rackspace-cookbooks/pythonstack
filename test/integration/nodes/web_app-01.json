@@ -7,21 +7,28 @@
     "recipes": [
       "pythonstack::application_python"
     ],
+    "ipaddress": "192.168.0.52",
     "roles": [
     ]
   },
   "tags": [
-    "app_node"
+    "python_app_node"
   ],
   "normal": {
   },
   "chef_type": "node",
   "default": {
+    "apache": {
+      "sites": {
+        "example.com": {
+          "port": 80
+        }
+      }
+    }
   },
   "override": {
   },
   "run_list": [
     "recipe[pythonstack::application_python]"
-  ],
-  "ipaddress": "192.168.0.52"
+  ]
 }

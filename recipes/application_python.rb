@@ -113,4 +113,4 @@ node.default['rackspace_cloudbackup']['backups'] =
     }
   ]
 
-tag('app_node')
+tag('python_app_node')
