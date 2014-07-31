@@ -7,6 +7,7 @@
     "recipes": [
       "pythonstack::application_python"
     ],
+    "ipaddress": "192.168.0.52",
     "roles": [
     ]
   },
@@ -22,6 +23,5 @@
   },
   "run_list": [
     "recipe[pythonstack::application_python]"
-  ],
-  "ipaddress": "192.168.0.52"
+  ]
 }
