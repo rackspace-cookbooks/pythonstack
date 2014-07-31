@@ -22,9 +22,6 @@ include_recipe 'chef-sugar'
 
 add_iptables_rule('INPUT', "-p tcp --dport #{node['varnish']['listen_port']} -j ACCEPT", 9997, 'allow web browsers to connect')
 
-# let us set up a more complicated vcl config if needed
-node.default['varnish']['vcl_cookbook'] = 'pythonstack' if node['pythonstack']['varnish']['multi']
-node.default['varnish']['vcl_source'] = 'varnish-default-vcl.erb' if node['pythonstack']['varnish']['multi']
 # set the default port to send things on to something that might be useful
 node.default['varnish']['backend_port'] = node['apache']['listen_ports'].first
 
@@ -35,7 +32,7 @@ if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
   backend_nodes = nil
 else
-  backend_nodes = search('node', 'tags:app_node' << " AND chef_environment:#{node.chef_environment}")
+  backend_nodes = search('node', 'tags:python_app_node' << " AND chef_environment:#{node.chef_environment}")
 end
 
 backend_nodes.each do |backend_node|
@@ -59,4 +56,14 @@ end
 
 node.default['pythonstack']['varnish']['backends'] = backend_hosts
 
+# only set if we have backends to populate (aka not on first run with an all in one node)
+if backend_nodes.first.nil?
+  # if our backends go away we needs this
+  node.default['varnish']['vcl_cookbook'] = 'varnish'
+  node.default['varnish']['vcl_source'] = 'default.vcl.erb'
+else
+  # let us set up a more complicated vcl config if needed
+  node.default['varnish']['vcl_cookbook'] = 'pythonstack' if node['pythonstack']['varnish']['multi']
+  node.default['varnish']['vcl_source'] = 'varnish-default-vcl.erb' if node['pythonstack']['varnish']['multi']
+end
 include_recipe 'varnish::default'
