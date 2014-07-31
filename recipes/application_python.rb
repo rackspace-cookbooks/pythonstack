@@ -23,6 +23,7 @@ include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
 include_recipe 'mysql::client'
+include_recipe 'build-essential'
 
 python_pip 'distribute'
 if platform_family?('debian')
