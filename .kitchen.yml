@@ -55,7 +55,6 @@ suites:
   - name: application_python
     run_list:
       - recipe[pythonstack::application_python]
-      - recipe[pythonstack::mysql_master]
     attributes:
       mysql:
         server_root_password: "randompass"
@@ -66,4 +65,10 @@ suites:
       - recipe[pythonstack::varnish]
   - name: memcached
     run_list:
+      - recipe[pythonstack::memcached]
+  - name: all-in-one
+    run_list:
+      - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::application_python]
+      - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
