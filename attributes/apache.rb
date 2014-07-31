@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-if node['pythonstack']['pythonstack']['enabled']
+if node['pythonstack']['demo']['enabled']
   site1 = 'example.com'
   version1 = '0.0.6'
 
