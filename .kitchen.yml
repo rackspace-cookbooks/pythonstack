@@ -63,10 +63,10 @@ suites:
       - recipe[pythonstack::memcached]
   - name: all-in-one
     run_list:
-      - recipe[pythonstack::mysql_master]
       - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
       - recipe[pythonstack::application_python]
+      - recipe[pythonstack::mysql_master]
     attributes:
       mysql:
         server_root_password: "randompass"
