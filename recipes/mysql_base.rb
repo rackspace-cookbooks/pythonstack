@@ -21,7 +21,6 @@
 # Include the necessary recipes.
 include_recipe 'apt' if node.platform_family?('debian')
 include_recipe 'chef-sugar'
-include_recipe 'database::mysql'
 include_recipe 'platformstack::monitors'
 
 # set passwords dynamically...
@@ -33,6 +32,7 @@ end
 
 include_recipe 'mysql::server'
 include_recipe 'mysql-multi'
+include_recipe 'database::mysql'
 
 connection_info = {
   host: 'localhost',
