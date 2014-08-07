@@ -18,7 +18,8 @@
 # limitations under the License.
 #
 
-include_recipe 'pythonstack::apache'
+include_recipe 'pythonstack::apache' unless node['pythonstack']['apache']['enabled'].nil?
+include_recipe 'pythonstack::nginx' unless node['pythonstack']['nginx']['enabled'].nil?
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
@@ -34,6 +35,7 @@ python_pip 'sqlalchemy'
 python_pip 'flask'
 python_pip 'python-memcached'
 python_pip 'gunicorn'
+python_pip 'uwsgi'
 python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
