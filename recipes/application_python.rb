@@ -40,7 +40,7 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
-if node['pythonstack']['apache']['enabled'] == true
+if node['pythonstack']['apache']['enabled'] == true && !node['apache']['sites'].nil?
 
   node['apache']['sites'].each do | site_name |
     site_name = site_name[0]
@@ -72,17 +72,13 @@ if node['pythonstack']['apache']['enabled'] == true
       cookbook_name: cookbook_name,
       # if it responds then we will create the config section in the ini file
       mysql: if mysql_node.respond_to?('deep_fetch')
-             if mysql_node.deep_fetch('apache', 'sites').nil?
-               nil
-             else
                mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
-             end
-           end,
+             end,
       mysql_master_host: if mysql_node.respond_to?('deep_fetch')
-                         best_ip_for(mysql_node)
-                       else
-                         nil
-                       end
+                           best_ip_for(mysql_node)
+                         else
+                           nil
+                         end
     )
     action 'create'
   end
