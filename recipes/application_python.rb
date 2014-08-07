@@ -40,51 +40,53 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
-node['apache']['sites'].each do | site_name |
-  site_name = site_name[0]
+if node['pythonstack']['apache']['enabled'] == true
 
-  application site_name do
-    path node['apache']['sites'][site_name]['docroot']
-    owner node['apache']['user']
-    group node['apache']['group']
-    deploy_key node['apache']['sites'][site_name]['deploy_key']
-    repository node['apache']['sites'][site_name]['repository']
-    revision node['apache']['sites'][site_name]['revision']
+  node['apache']['sites'].each do | site_name |
+    site_name = site_name[0]
+
+    application site_name do
+      path node['apache']['sites'][site_name]['docroot']
+      owner node['apache']['user']
+      group node['apache']['group']
+      deploy_key node['apache']['sites'][site_name]['deploy_key']
+      repository node['apache']['sites'][site_name]['repository']
+      revision node['apache']['sites'][site_name]['revision']
+    end
   end
-end
 
-if Chef::Config[:solo]
-  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  mysql_node = nil
-else
-  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
-end
-template 'pythonstack.ini' do
-  path '/etc/pythonstack.ini'
-  cookbook node['pythonstack']['ini']['cookbook']
-  source 'pythonstack.ini.erb'
-  owner 'root'
-  group node['apache']['group']
-  mode '00640'
-  variables(
-    cookbook_name: cookbook_name,
-    # if it responds then we will create the config section in the ini file
-    mysql: if mysql_node.respond_to?('deep_fetch')
+  if Chef::Config[:solo]
+    Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+    mysql_node = nil
+  else
+    mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
+  end
+  template 'pythonstack.ini' do
+    path '/etc/pythonstack.ini'
+    cookbook node['pythonstack']['ini']['cookbook']
+    source 'pythonstack.ini.erb'
+    owner 'root'
+    group node['apache']['group']
+    mode '00640'
+    variables(
+      cookbook_name: cookbook_name,
+      # if it responds then we will create the config section in the ini file
+      mysql: if mysql_node.respond_to?('deep_fetch')
              if mysql_node.deep_fetch('apache', 'sites').nil?
                nil
              else
                mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
              end
            end,
-    mysql_master_host: if mysql_node.respond_to?('deep_fetch')
+      mysql_master_host: if mysql_node.respond_to?('deep_fetch')
                          best_ip_for(mysql_node)
                        else
                          nil
                        end
-  )
-  action 'create'
+    )
+    action 'create'
+  end
 end
-
 # backups
 node.default['rackspace']['datacenter'] = node['rackspace']['region']
 node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] = 'example@example.com'

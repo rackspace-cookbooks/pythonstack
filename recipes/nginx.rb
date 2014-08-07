@@ -19,7 +19,7 @@
 #
 
 # Include the necessary recipes.
-%w(platformstack::monitors platformstack::iptables apt chef-sugar nginx::default nginx::geoip).each do |recipe|
+%w(platformstack::monitors platformstack::iptables apt chef-sugar nginx::default nginx::http_geoip_module).each do |recipe|
   include_recipe recipe
 end
 
@@ -33,8 +33,8 @@ unless node['nginx']['sites'].nil?
 
     template "#{site['server_name']}_nginx.conf" do
       cookbook 'pythonstack'
-      source 'default_nginx.conf.erb'
-      path "/etc/nginx/sites-available/#{site['server_name']}_nginx.conf"
+      source 'nginx/sites/default_nginx.conf.erb'
+      path "/etc/nginx/sites-available/#{site['server_name']}"
       owner 'root'
       group 'root'
       mode '0644'
@@ -50,7 +50,7 @@ unless node['nginx']['sites'].nil?
     end
 
     nginx_site site_name do
-      enable true
+      enable true if File.exist?("#{site['docroot']}/wsgi.py")
     end
 
     template "http-monitor-#{site['server_name']}" do
