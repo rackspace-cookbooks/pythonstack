@@ -25,3 +25,5 @@ depends 'python'
 depends 'varnish'
 depends 'yum'
 depends 'nginx'
+depends 'redis-multi'
+
