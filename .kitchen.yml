@@ -1,7 +1,6 @@
 ---
 driver:
   name: vagrant
-
 provisioner:
   name: chef_zero
   attributes:
@@ -21,16 +20,16 @@ provisioner:
       cloud_credentials:
         username: 'racker'
         api_key: 'secret'
-
 platforms:
   - name: ubuntu-12.04
+    run_list:
+    - recipe[apt]
+  - name: ubuntu-14.04
     run_list:
     - recipe[apt]
   - name: centos-6.5
     run_list:
     - recipe[yum]
-
-
 suites:
   - name: mysql-master
     run_list:
@@ -74,3 +73,16 @@ suites:
         server_debian_password: "randompass"
       holland:
         password: "randompass"
+  - name: redis-master
+    run_list:
+      - recipe[pythonstack::redis_master]
+    attributes:
+  - name: redis-slave
+    run_list:
+      - recipe[pythonstack::redis_slave]
+    attributes:
+  - name: redis-sentinel
+    run_list:
+      - recipe[pythonstack::redis_sentinel]
+    attributes:
+
