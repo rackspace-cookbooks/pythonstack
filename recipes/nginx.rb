@@ -20,7 +20,7 @@
 
 case node['platform_family']
 when 'debian'
-  package 'automake'
+  package 'automake1.11'
 when 'rhel'
 end
 
