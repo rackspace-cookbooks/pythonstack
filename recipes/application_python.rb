@@ -83,16 +83,26 @@ if node['pythonstack']['apache']['enabled'] == true && !node['apache']['sites'].
     action 'create'
   end
 end
+
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  memcached_node = nil
 else
+  memcached_node = search('node', 'role:memcached'\
+                  " AND chef_environment:#{node.chef_environment}").first
   if !memcached_node.nil?
     node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
   else
     node.set['pythonstack']['memcached']['host'] = nil
   end
+  db_node = search('node', 'role:db'\
+                  " AND chef_environment:#{node.chef_environment}").first
+  if db_node.nil?
+    node.set['pythonstack']['database']['host'] = 'localhost'
+  else
+    node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
+  end
 end
+
 
 # backups
 node.default['rackspace']['datacenter'] = node['rackspace']['region']
