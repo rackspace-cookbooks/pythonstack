@@ -18,7 +18,8 @@
 # limitations under the License.
 #
 
-include_recipe 'pythonstack::apache'
+include_recipe 'pythonstack::apache' unless node['pythonstack']['apache']['enabled'].nil?
+include_recipe 'pythonstack::nginx' unless node['pythonstack']['nginx']['enabled'].nil?
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
@@ -34,53 +35,72 @@ python_pip 'sqlalchemy'
 python_pip 'flask'
 python_pip 'python-memcached'
 python_pip 'gunicorn'
+python_pip 'uwsgi'
 python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
-node['apache']['sites'].each do | site_name |
-  site_name = site_name[0]
+if node['pythonstack']['apache']['enabled'] == true && !node['apache']['sites'].nil?
 
-  application site_name do
-    path node['apache']['sites'][site_name]['docroot']
-    owner node['apache']['user']
+  node['apache']['sites'].each do | site_name |
+    site_name = site_name[0]
+
+    application site_name do
+      path node['apache']['sites'][site_name]['docroot']
+      owner node['apache']['user']
+      group node['apache']['group']
+      deploy_key node['apache']['sites'][site_name]['deploy_key']
+      repository node['apache']['sites'][site_name]['repository']
+      revision node['apache']['sites'][site_name]['revision']
+    end
+  end
+
+  if Chef::Config[:solo]
+    Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+    mysql_node = nil
+  else
+    mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
+  end
+  template 'pythonstack.ini' do
+    path '/etc/pythonstack.ini'
+    cookbook node['pythonstack']['ini']['cookbook']
+    source 'pythonstack.ini.erb'
+    owner 'root'
     group node['apache']['group']
-    deploy_key node['apache']['sites'][site_name]['deploy_key']
-    repository node['apache']['sites'][site_name]['repository']
-    revision node['apache']['sites'][site_name]['revision']
+    mode '00640'
+    variables(
+      cookbook_name: cookbook_name,
+      # if it responds then we will create the config section in the ini file
+      mysql: if mysql_node.respond_to?('deep_fetch')
+               mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
+             end,
+      mysql_master_host: if mysql_node.respond_to?('deep_fetch')
+                           best_ip_for(mysql_node)
+                         else
+                           nil
+                         end
+    )
+    action 'create'
   end
 end
 
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  mysql_node = nil
 else
-  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
-end
-template 'pythonstack.ini' do
-  path '/etc/pythonstack.ini'
-  cookbook node['pythonstack']['ini']['cookbook']
-  source 'pythonstack.ini.erb'
-  owner 'root'
-  group node['apache']['group']
-  mode '00640'
-  variables(
-    cookbook_name: cookbook_name,
-    # if it responds then we will create the config section in the ini file
-    mysql: if mysql_node.respond_to?('deep_fetch')
-             if mysql_node.deep_fetch('apache', 'sites').nil?
-               nil
-             else
-               mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
-             end
-           end,
-    mysql_master_host: if mysql_node.respond_to?('deep_fetch')
-                         best_ip_for(mysql_node)
-                       else
-                         nil
-                       end
-  )
-  action 'create'
+  memcached_node = search('node', 'role:memcached'\
+                  " AND chef_environment:#{node.chef_environment}").first
+  if !memcached_node.nil?
+    node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+  else
+    node.set['pythonstack']['memcached']['host'] = nil
+  end
+  db_node = search('node', 'role:db'\
+                  " AND chef_environment:#{node.chef_environment}").first
+  if db_node.nil?
+    node.set['pythonstack']['database']['host'] = 'localhost'
+  else
+    node.set['pythonstack']['database']['host'] = best_ip_for(db_node)
+  end
 end
 
 # backups

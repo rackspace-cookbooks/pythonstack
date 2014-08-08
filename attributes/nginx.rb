@@ -1,7 +1,7 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
-# Recipe:: default
+# Recipe:: nginx
 #
 # Copyright 2014, Rackspace UK, Ltd.
 #
@@ -17,7 +17,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-node.set['pythonstack']['newrelic']['application_monitoring'] = ''
-node.set['pythonstack']['apache']['enabled'] = nil
-node.set['pythonstack']['nginx']['enabled'] = true

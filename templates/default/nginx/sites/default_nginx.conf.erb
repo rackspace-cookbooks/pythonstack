@@ -1,0 +1,33 @@
+# <%= @server_name %>_nginx.conf
+
+# the upstream component nginx needs to connect to
+upstream <%= @upstream_name %> {
+    server 127.0.0.1:<%= @upstream_port %>;
+}
+
+# configuration of the server
+server {
+    # the port your site will be served on
+    listen      <%= @nginx_port %>;
+    # the domain name it will serve for
+    server_name <%= @server_name %>; # substitute your machine's IP address or FQDN
+    charset     utf-8;
+
+    # max upload size
+    client_max_body_size 75M;   # adjust to taste
+
+    # Django media
+    location /media  {
+        alias <%= @media_location %>;  # your Django project's media files - amend as required
+    }
+
+    location /static {
+        alias <%= @static_location %>; # your Django project's static files - amend as required
+    }
+
+    # Finally, send all non-media requests to the Django server.
+    location / {
+        uwsgi_pass  <%= @upstream_name %>;
+        include     <%= @wsgi_script %>; # the uwsgi_params file you installed
+    }
+}
