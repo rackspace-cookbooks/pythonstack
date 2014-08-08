@@ -19,3 +19,5 @@
 #
 
 node.set['pythonstack']['newrelic']['application_monitoring'] = ''
+node.set['pythonstack']['apache']['enabled'] = nil
+node.set['pythonstack']['nginx']['enabled'] = true
