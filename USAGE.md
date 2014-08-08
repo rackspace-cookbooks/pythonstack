@@ -103,3 +103,21 @@ Slave node:
   ]
 }
 ```
+
+* Building pythonstack with Redis single node.
+
+Ensure the following attributes are set within environment or wrapper cookbook.
+
+
+single node:
+```json
+{
+  "run_list": [
+  "recipe[platformstack::default]",
+  "recipe[rackops_rolebook::default]",
+  "recipe[pythonstack]"
+  "recipe[pythonstack::redis_base]"
+  ]
+}
+
+```

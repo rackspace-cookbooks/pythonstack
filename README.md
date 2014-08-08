@@ -57,6 +57,9 @@ Sets up default IP talbles rule to allow acces on ['postgresql']['port']
 Runs pythonstack::postgresql_base along with pg-multi::pg_master recipes
 #### postgresql_slave
 Runs pythonstack::postgresql_base along with pg-multi::pg_slave recipes
+#### redis_base
+Sets up a standalone redis node. It uses rackspace-support/redis-multi cookbook and includes redis-multi, redis-multi::single and redis-multi::enable and opens port in iptables.
+
 
 Data_Bag
 ----------
@@ -152,6 +155,7 @@ Attributes
   * Used to enable needed repo for postgresql for RedHat family OS's
 * default['postgresql']['enable_pdgd_apt'] = true  (needed for Debian Family)
   * Used to enable needed repo for postgresql for Debian family OS's
+
 
 Usage
 -----
