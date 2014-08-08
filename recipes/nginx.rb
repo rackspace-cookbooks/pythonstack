@@ -18,12 +18,6 @@
 # limitations under the License.
 #
 
-case node['platform_family']
-when 'debian'
-  package 'automake1.11'
-when 'rhel'
-end
-
 # Include the necessary recipes.
 %w(platformstack::monitors platformstack::iptables apt chef-sugar nginx::default).each do |recipe|
   include_recipe recipe
