@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 pythonstack CHANGELOG
 =====================
 
@@ -16,7 +15,6 @@ This file is used to list changes made in each version of the pythonstack/ cookb
 0.1.0
 -----
 - [your_name] - Initial release of pythonstack/
->>>>>>> e82aa59ae64ccf64ebc6f26744e217c50b68f637
 
 - - -
 Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
