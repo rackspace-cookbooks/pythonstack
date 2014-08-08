@@ -83,6 +83,17 @@ if node['pythonstack']['apache']['enabled'] == true && !node['apache']['sites'].
     action 'create'
   end
 end
+if Chef::Config[:solo]
+  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+  memcached_node = nil
+else
+  if !memcached_node.nil?
+    node.set['pythonstack']['memcached']['host'] = best_ip_for(memcached_node)
+  else
+    node.set['pythonstack']['memcached']['host'] = nil
+  end
+end
+
 # backups
 node.default['rackspace']['datacenter'] = node['rackspace']['region']
 node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] = 'example@example.com'
