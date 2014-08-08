@@ -106,8 +106,6 @@ Slave node:
 
 * Building pythonstack with Redis single node.
 
-Ensure the following attributes are set within environment or wrapper cookbook.
-
 
 single node:
 ```json
