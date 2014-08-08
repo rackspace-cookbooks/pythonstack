@@ -18,6 +18,12 @@
 # limitations under the License.
 #
 
+case node['platform_family']
+when 'debian'
+  package 'automake'
+when 'rhel'
+end
+
 # Include the necessary recipes.
 %w(platformstack::monitors platformstack::iptables apt chef-sugar nginx::default nginx::http_geoip_module).each do |recipe|
   include_recipe recipe

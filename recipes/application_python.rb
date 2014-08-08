@@ -103,7 +103,6 @@ else
   end
 end
 
-
 # backups
 node.default['rackspace']['datacenter'] = node['rackspace']['region']
 node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] = 'example@example.com'
