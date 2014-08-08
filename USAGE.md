@@ -103,3 +103,19 @@ Slave node:
   ]
 }
 ```
+
+* Building pythonstack with Redis single node.
+
+
+single node:
+```json
+{
+  "run_list": [
+  "recipe[platformstack::default]",
+  "recipe[rackops_rolebook::default]",
+  "recipe[pythonstack]"
+  "recipe[pythonstack::redis_base]"
+  ]
+}
+
+```
