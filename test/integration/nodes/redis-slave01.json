@@ -12,7 +12,8 @@
       "redis_slave"
     ],
     "tags": [
-      "redis_slave"
+      "redis_slave",
+      "redis"
     ],
     "ipaddress": "192.168.0.23"
   },
