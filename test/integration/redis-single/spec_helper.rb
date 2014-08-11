@@ -9,3 +9,4 @@ RSpec.configure do |c|
     c.path = '/sbin:/usr/bin'
   end
 end
+
