@@ -31,36 +31,7 @@ platforms:
     run_list:
     - recipe[yum]
 suites:
-  - name: mysql-master
-    run_list:
-      - recipe[pythonstack::mysql_master]
-    attributes:
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
-      holland:
-        password: "randompass"
-  - name: mysql-slave
-    run_list:
-      - recipe[pythonstack::mysql_slave]
-    attributes:
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
-      holland:
-        password: "randompass"
-  - name: application_python
-    run_list:
-      - recipe[pythonstack::application_python]
-  - name: varnish
-    run_list:
-      - recipe[pythonstack::varnish]
-  - name: memcached
-    run_list:
-      - recipe[pythonstack::memcached]
-  - name: all-in-one
+  - name: default
     run_list:
       - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
@@ -73,16 +44,3 @@ suites:
         server_debian_password: "randompass"
       holland:
         password: "randompass"
-  - name: redis-master
-    run_list:
-      - recipe[pythonstack::redis_master]
-    attributes:
-  - name: redis-slave
-    run_list:
-      - recipe[pythonstack::redis_slave]
-    attributes:
-  - name: redis-sentinel
-    run_list:
-      - recipe[pythonstack::redis_sentinel]
-    attributes:
-
