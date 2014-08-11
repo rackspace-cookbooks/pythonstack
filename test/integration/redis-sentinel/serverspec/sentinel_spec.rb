@@ -28,7 +28,7 @@ describe command(redis_query) do
   it { should return_stdout(/^# Sentinel/) }
   it { should return_stdout(/^sentinel_masters:/) }
   it { should return_stdout(/^master0:name=sentinel_46379-sentinel,status=sdown,address=192.168.0.23:6379,slaves=0,sentinels=1/) }
-  it { should return_stdout(/^tcp_port:46379/) }
+  #it { should return_stdout(/^tcp_port:46379/) }
 end
 
 describe file('/etc/redis') do
