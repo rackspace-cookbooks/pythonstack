@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 
+include_recipe 'pythonstack::yum'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 include_recipe 'python::package'
