@@ -1,6 +1,6 @@
 # Encoding: utf-8
 #
-# Cookbook Name:: phpstack
+# Cookbook Name:: pythonstack
 # Recipe:: rabbitmq
 #
 # Copyright 2014, Rackspace Hosting
@@ -43,13 +43,13 @@ node['apache']['sites'].each do |site_name|
 
   # set random app passwords
   ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
-  node.set_unless['phpstack']['rabbitmq']['passwords'][site_name] = secure_password
+  node.set_unless['pythonstack']['rabbitmq']['passwords'][site_name] = secure_password
 
   # add the queue per site
   rabbitmq_user site_name do
     action %w(add set_permissions change_password)
     vhost "/#{site_name}"
     permissions '.* .* .*'
-    password node['phpstack']['rabbitmq']['passwords'][site_name]
+    password node['pythonstack']['rabbitmq']['passwords'][site_name]
   end
 end
