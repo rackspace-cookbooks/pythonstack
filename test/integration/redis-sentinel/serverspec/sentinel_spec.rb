@@ -23,12 +23,12 @@ describe port(46_379) do
   it { should be_listening }
 end
 
-redis_query = 'redis-cli -p 46379 INFO'
-describe command(redis_query) do
+#redis_query = 'redis-cli -p 46379 INFO'
+#describe command(redis_query) do
   #it { should return_stdout(/^# Sentinel/) }
   #it { should return_stdout(/^sentinel_masters:/) }
-  it { should return_stdout(/^master0:name=sentinel_46379-sentinel,status=sdown,address=192.168.0.23:6379,slaves=0,sentinels=1/) }
-end
+#  it { should return_stdout(/^master0:name=sentinel_46379-sentinel,status=sdown,address=192.168.0.23:6379,slaves=0,sentinels=1/) }
+#end
 
 describe file('/etc/redis') do
   it { should be_directory }
