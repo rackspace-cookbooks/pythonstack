@@ -21,6 +21,7 @@ include_recipe 'build-essential'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 include_recipe 'python::package'
+include_recipe 'python::pip'
 include_recipe 'python'
 include_recipe 'mysql::client'
 
