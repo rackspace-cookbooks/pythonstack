@@ -36,6 +36,7 @@ suites:
       - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
       - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python]
     attributes:
       mysql:

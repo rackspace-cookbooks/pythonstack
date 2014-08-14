@@ -7,13 +7,18 @@ if os[:family] == 'RedHat'
   describe service('httpd') do
     it { should be_enabled }
   end
+  apache2ctl = '/usr/sbin/apachectl'
 else
   describe service('apache2') do
     it { should be_enabled }
   end
+  apache2ctl = '/usr/sbin/apachectl'
 end
 describe port(80) do
   it { should be_listening }
+end
+describe command("#{apache2ctl} -M") do
+  it { should return_stdout(/^ ssl_module/) }
 end
 
 # memcache
@@ -48,4 +53,18 @@ describe service('varnish') do
 end
 describe port(6081) do
   it { should be_listening }
+end
+
+# rabbitmq
+describe service('rabbitmq-server') do
+  it { should be_enabled }
+  it { should be_running }
+end
+describe port(5672) do
+  it { should be_listening }
+end
+
+# pythonstack.ini
+describe file('/etc/pythonstack.ini') do
+  it { should be_file }
 end

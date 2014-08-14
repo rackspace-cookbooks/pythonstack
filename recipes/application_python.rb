@@ -59,8 +59,10 @@ end
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
   mysql_node = nil
+  rabbit_node = nil
 else
   mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
+  rabbit_node = search('node', "recipes:pythonstack\\:\\:rabbitmq AND chef_environment:#{node.chef_environment}").first
 end
 template 'pythonstack.ini' do
   path '/etc/pythonstack.ini'
@@ -83,7 +85,17 @@ template 'pythonstack.ini' do
                          best_ip_for(mysql_node)
                        else
                          nil
-                       end
+                       end,
+    rabbit_host: if rabbit_node.respond_to?('deep_fetch')
+                   best_ip_for(rabbit_node)
+                 else
+                   nil
+                 end,
+    rabbit_passwords: if rabbit_node.respond_to?('deep_fetch')
+                        rabbit_node.deep_fetch('phpstack', 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node['phpstack']['rabbitmq']['passwords']
+                      else
+                        nil
+                      end
   )
   action 'create'
 end
