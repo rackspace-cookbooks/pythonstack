@@ -37,6 +37,7 @@ suites:
     run_list:
       - recipe[pythonstack::varnish]
       - recipe[pythonstack::memcached]
+      - recipe[pythonstack::redis_base]
       - recipe[pythonstack::mysql_master]
       - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python]
