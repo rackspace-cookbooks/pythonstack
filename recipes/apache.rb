@@ -22,6 +22,7 @@ include_recipe 'chef-sugar'
 
 if rhel?
   include_recipe 'yum-epel'
+  include_recipe 'yum-ius'
 end
 
 # Include the necessary recipes.
