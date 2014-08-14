@@ -17,14 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-include_recipe 'pythonstack::yum'
+include_recipe 'build-essential'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python'
 include_recipe 'mysql::client'
-include_recipe 'build-essential'
 
 python_pip 'distribute'
 if platform_family?('debian')
