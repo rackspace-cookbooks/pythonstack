@@ -17,13 +17,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+include_recipe 'build-essential'
 include_recipe 'pythonstack::apache'
 include_recipe 'git'
 include_recipe 'python::package'
+include_recipe 'python::pip'
+python_pip 'setuptools' do
+  action :upgrade
+  version node['python']['setuptools_version']
+end
+
 include_recipe 'python'
 include_recipe 'mysql::client'
-include_recipe 'build-essential'
 
 python_pip 'distribute'
 if platform_family?('debian')
