@@ -30,6 +30,7 @@ search_add_iptables_rules("tags:python_app_node AND chef_environment:#{node.chef
 
 # disable the default user
 node.default['rabbitmq']['disabled_users'] = %w(guest)
+node.default['rabbitmq']['job_control'] = 'upstart'
 
 include_recipe 'rabbitmq'
 

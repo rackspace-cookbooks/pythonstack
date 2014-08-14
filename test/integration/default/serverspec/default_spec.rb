@@ -65,6 +65,6 @@ describe port(6872) do
 end
 
 # pythonstack.ini
-describe file('/etc/phpstack.ini') do
+describe file('/etc/pythonstack.ini') do
   it { should be_file }
 end
