@@ -51,7 +51,7 @@ suites:
 
   - name: web
     run_list:
-      - recipe[pythonstack::application_php]
+      - recipe[pythonstack::application_python]
 
   - name: mysql
     run_list:
