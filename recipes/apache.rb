@@ -18,9 +18,15 @@
 # limitations under the License.
 #
 
+include_recipe 'chef-sugar'
+
+if rhel?
+  include_recipe 'yum-epel'
+end
+
 # Include the necessary recipes.
-%w(platformstack::monitors platformstack::iptables apt chef-sugar
-   apache2::default apache2::mod_wsgi apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python).each do |recipe|
+%w(platformstack::monitors platformstack::iptables apt apache2 apache2::mod_wsgi
+   apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python).each do |recipe|
   include_recipe recipe
 end
 
