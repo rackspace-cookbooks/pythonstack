@@ -20,6 +20,7 @@ provisioner:
       cloud_credentials:
         username: 'racker'
         api_key: 'secret'
+
 platforms:
   - name: ubuntu-12.04
     run_list:
@@ -30,6 +31,7 @@ platforms:
   - name: centos-6.5
     run_list:
     - recipe[yum]
+
 suites:
   - name: default
     run_list:
@@ -38,6 +40,21 @@ suites:
       - recipe[pythonstack::mysql_master]
       - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python]
+    attributes:
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+      holland:
+        password: "randompass"
+
+  - name: web
+    run_list:
+      - recipe[pythonstack::application_php]
+
+  - name: mysql
+    run_list:
+      - recipe[pythonstack::mysql_base]
     attributes:
       mysql:
         server_root_password: "randompass"
