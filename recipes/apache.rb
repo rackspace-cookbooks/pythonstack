@@ -59,7 +59,7 @@ unless node['apache']['sites'].nil?
       group 'root'
       mode '0644'
       variables(
-        apache_port: site['port'],
+        http_port: site['port'],
         server_name: site['server_name']
       )
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
