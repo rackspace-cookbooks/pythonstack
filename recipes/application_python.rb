@@ -96,7 +96,7 @@ node.default['rackspace_cloudbackup']['backups'] =
   [
     {
       location: node['apache']['docroot_dir'],
-      enable: node['pythonstack']['rackspace_cloudbackup']['apache_docroot']['enable'],
+      enable: node['pythonstack']['rackspace_cloudbackup']['http_docroot']['enable'],
       comment: 'Web Content Backup',
       cloud: { notify_email: node['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] }
     }
