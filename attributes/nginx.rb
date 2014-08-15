@@ -30,8 +30,7 @@ if node['pythonstack']['demo']['enabled']
   default['nginx']['sites'][site1]['template']     = "nginx2/sites/#{site1}.erb"
   default['nginx']['sites'][site1]['server_name']  = site1
   default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
-  default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['docroot_dir']}/#{site1}"
-  default['nginx']['sites'][site1]['allow_override'] = ['All']
+  default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
   default['nginx']['sites'][site1]['errorlog']     = "#{node['nginx']['log_dir']}/#{site1}-error.log"
   default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
   default['nginx']['sites'][site1]['loglevel']     = 'warn'

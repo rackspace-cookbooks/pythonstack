@@ -5,11 +5,11 @@
 #
 # Copyright 2014, Rackspace UK, Ltd.
 #
-# Licensed under the nginx License, Version 2.0 (the "License");
+# Licensed under the apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.nginx.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,7 +47,7 @@ unless node['nginx']['sites'].nil?
 
     # Uwsgi set up
     uwsgi_service site_name do
-      home_path site['docroot']
+      home_path "#{site['docroot']}/current"
       pid_path "/var/run/uwsgi-#{site_name}.pid"
       host "127.0.0.1"
       port site['uswgi_port']
@@ -58,12 +58,15 @@ unless node['nginx']['sites'].nil?
     # Nginx set up
     template site_name do
       cookbook 'pythonstack'
-      source "nginx/#{sitename}.erb"
+      source "nginx/sites/#{site_name}.erb"
+      path "#{node['nginx']['dir']}/sites-available/#{site_name}"
       owner 'root'
       group 'root'
       mode '0644'
       variables(
+        name: site_name,
         port: site['port'],
+        uswgi_port: site['uswgi_port'],
         server_name: site['server_name'],
         server_aliases: site['server_alias'],
         allow_override: site['allow_override'],
@@ -71,7 +74,10 @@ unless node['nginx']['sites'].nil?
         customlog: site['customlog'],
         loglevel: site['loglevel']
       )
-
+      notifies :reload, 'service[nginx]'
+    end
+    nginx_site site_name do
+          enable true
     end
 #    template "http-monitor-#{site['server_name']}" do
 #      cookbook 'pythonstack'
