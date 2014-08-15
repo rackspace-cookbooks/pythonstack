@@ -52,6 +52,8 @@ unless node['nginx']['sites'].nil?
       host "127.0.0.1"
       port site['uswgi_port']
       worker_processes 2
+      master true
+      die_on_term true
       app site['app']
     end
 
