@@ -53,6 +53,7 @@ node['nginx']['sites'].each do | site_name |
     deploy_key node['nginx']['sites'][site_name]['deploy_key']
     repository node['nginx']['sites'][site_name]['repository']
     revision node['nginx']['sites'][site_name]['revision']
+    restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ]; then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi"
   end
 end
 
