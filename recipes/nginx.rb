@@ -79,20 +79,20 @@ unless node['nginx']['sites'].nil?
     nginx_site site_name do
           enable true
     end
-#    template "http-monitor-#{site['server_name']}" do
-#      cookbook 'pythonstack'
-#      source 'monitoring-remote-http.yaml.erb'
-#      path "/etc/rackspace-monitoring-agent.conf.d/#{site['server_name']}-http-monitor.yaml"
-#      owner 'root'
-#      group 'root'
-#      mode '0644'
-#      variables(
-#        nginx_port: site['port'],
-#        server_name: site['server_name']
-#      )
-#      notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
-#      action 'create'
-#      only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
-#    end
+    template "http-monitor-#{site['server_name']}" do
+      cookbook 'pythonstack'
+      source 'monitoring-remote-http.yaml.erb'
+      path "/etc/rackspace-monitoring-agent.conf.d/#{site['server_name']}-http-monitor.yaml"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        http_port: site['port'],
+        server_name: site['server_name']
+      )
+      notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
+      action 'create'
+      only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+    end
   end
 end
