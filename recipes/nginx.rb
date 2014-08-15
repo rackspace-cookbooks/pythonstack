@@ -34,6 +34,11 @@ end
 # Install Uwsgi
 include_recipe 'uwsgi'
 
+# Pid is different on Ubuntu 14, causing nginx service to fail https://github.com/miketheman/nginx/issues/248
+if ubuntu_trusty?
+  node.default['nginx']['pid'] = '/run/nginx.pid'
+end
+
 # Install Nginx
 include_recipe 'nginx'
 
@@ -44,6 +49,7 @@ unless node['nginx']['sites'].nil?
     site = node['nginx']['sites'][site_name]
 
     add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site['port']} -j ACCEPT", 100, 'Allow access to nginx')
+
 
     # Uwsgi set up
     uwsgi_service site_name do
