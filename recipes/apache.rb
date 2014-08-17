@@ -26,8 +26,17 @@ if rhel?
 end
 
 # Include the necessary recipes.
-%w(platformstack::monitors platformstack::iptables apt apache2 apache2::mod_wsgi
-   apache2::mod_proxy apache2::mod_proxy_http apache2::mod_python apache2::mod_ssl).each do |recipe|
+%w(
+  platformstack::monitors
+  platformstack::iptables
+  apt
+  apache2
+  apache2::mod_wsgi
+  apache2::mod_proxy
+  apache2::mod_proxy_http
+  apache2::mod_python
+  apache2::mod_ssl
+).each do |recipe|
   include_recipe recipe
 end
 
