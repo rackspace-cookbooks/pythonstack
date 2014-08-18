@@ -13,7 +13,7 @@ describe 'pythonstack::nginx' do
       end.converge(described_recipe)
     end
     before do
-        stub_command('which nginx').and_return('/usr/bin/nginx')
+      stub_command('which nginx').and_return('/usr/bin/nginx')
     end
     it 'creates a nginx site configuration' do
       expect(chef_run).to render_file('/etc/nginx/sites-available/example.com').with_content('server')
