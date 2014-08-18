@@ -98,6 +98,7 @@ template 'pythonstack.ini' do
                       end
   )
   action 'create'
+  notifies 'restart', 'service[apache2]', 'delayed'
 end
 
 # backups
