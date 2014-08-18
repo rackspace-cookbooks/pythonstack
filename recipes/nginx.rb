@@ -22,6 +22,12 @@ include_recipe 'chef-sugar'
 
 if rhel?
   include_recipe 'yum-epel'
+  # dependencies for uwsgi recipe (otherwise we have an error on virtualenv install)
+  include_recipe 'python::package'
+  include_recipe 'python::pip'
+  python_pip 'setuptools' do
+        action :upgrade
+  end
 elsif debian?
   include_recipe 'apt'
 end
