@@ -92,12 +92,13 @@ template 'pythonstack.ini' do
                    nil
                  end,
     rabbit_passwords: if rabbit_node.respond_to?('deep_fetch')
-                        rabbit_node.deep_fetch('phpstack', 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node['phpstack']['rabbitmq']['passwords']
+                        rabbit_node.deep_fetch('pythonstack', 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node['pythonstack']['rabbitmq']['passwords']
                       else
                         nil
                       end
   )
   action 'create'
+  notifies 'restart', 'service[apache2]', 'delayed'
 end
 
 # backups
