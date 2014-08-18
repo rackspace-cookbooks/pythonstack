@@ -44,7 +44,7 @@ end
 include_recipe 'nginx'
 
 # Properly disable default vhost on Rhel (https://github.com/miketheman/nginx/pull/230/files)
-# XXX should be removed once the PR has been merged
+# FIXME: should be removed once the PR has been merged
 if !node['nginx']['default_site_enabled'] && (node['platform_family'] == 'rhel' || node['platform_family'] == 'fedora')
   %w(default.conf example_ssl.conf).each do |config|
     file "/etc/nginx/conf.d/#{config}" do
@@ -58,28 +58,29 @@ unless node['nginx']['sites'].nil?
   node['nginx']['sites'].each do | site_name |
     site_name = site_name[0]
     site = node['nginx']['sites'][site_name]
-
     add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site['port']} -j ACCEPT", 100, 'Allow access to nginx')
 
-
     if rhel?
-       # Uwsgi path is different on Centos
-       node.default['nginx']['uwsgi']['bin'] = '/usr/bin/uwsgi'
-       # Create Docroot if missing (Redhat Nginx package default to /usr/share/html which we don't want to use to deploy)
+      # Uwsgi path is different on Centos
+      node.default['nginx']['uwsgi']['bin'] = '/usr/bin/uwsgi'
+      # Create Docroot if missing (Redhat Nginx package default to /usr/share/html which we don't want to use to deploy)
       directory site['docroot'] do
-           owner node['nginx']['user']
-           group node['nginx']['group']
-           action :create
-           recursive true
+        owner node['nginx']['user']
+        group node['nginx']['group']
+        action :create
+        recursive true
       end
+    else
+      node.default['nginx']['uwsgi']['bin'] = '/usr/local/bin/uwsgi'
     end
+
     uwsgi_service site_name do
       home_path "#{site['docroot']}/current"
-      uwsgi_bin node['nginx']['uwsgi']['bin']
+      uwsgi_bin node['nginx']['uwsgi']['bin'] if node['nginx']['uwsgi']['bin']
       uid node['nginx']['user']
       gid node['nginx']['group']
       pid_path "/var/run/uwsgi-#{site_name}.pid"
-      host "127.0.0.1"
+      host '127.0.0.1'
       port site['uswgi_port']
       worker_processes 2
       master true
@@ -109,7 +110,7 @@ unless node['nginx']['sites'].nil?
       notifies :reload, 'service[nginx]'
     end
     nginx_site site_name do
-          enable true
+      enable true
     end
     template "http-monitor-#{site['server_name']}" do
       cookbook 'pythonstack'
