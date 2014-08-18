@@ -1,0 +1,1 @@
+default['pythonstack']['rabbitmq']['passwords'] = {}

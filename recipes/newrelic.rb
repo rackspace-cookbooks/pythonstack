@@ -17,16 +17,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# If these recipes fail, the whole convergence will be considered unsuccessful
-critical_recipes = [
-  'newrelic',
-  'newrelic::python-agent'
-]
-
-node.set['pythonstack']['newrelic']['application_monitoring'] = 'true'
-
-# Run critical recipes
-critical_recipes.each do | recipe |
-  include_recipe recipe
+# The node['newrelic']['license'] attribute needs to be set for NewRelic to work
+if node['newrelic']['license']
+  node.set['pythonstack']['newrelic']['application_monitoring'] = 'true'
+  node.override['newrelic']['application_monitoring']['daemon']['ssl'] = true
+  node.override['newrelic']['server_monitoring']['ssl'] = true
+  include_recipe 'platformstack::default'
+  include_recipe 'newrelic::python-agent'
+else
+  Chef::Log.warn('The New Relic license attribute is not set!')
 end
