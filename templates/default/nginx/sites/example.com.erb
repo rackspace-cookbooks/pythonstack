@@ -10,7 +10,7 @@ server {
         access_log off;
   }
   location / {
-            uwsgi_pass 127.0.0.1:<%= @uswgi_port %>;
+            uwsgi_pass 127.0.0.1:<%= @uwsgi_port %>;
             include uwsgi_params;
   }
 

@@ -87,7 +87,7 @@ unless node['nginx']['sites'].nil?
       gid node['nginx']['group']
       pid_path "/var/run/uwsgi-#{site_name}.pid"
       host '127.0.0.1'
-      port site['uswgi_port']
+      port site['uwsgi_port']
       worker_processes 2
       master true
       die_on_term true
@@ -105,7 +105,7 @@ unless node['nginx']['sites'].nil?
       variables(
         name: site_name,
         port: site['port'],
-        uswgi_port: site['uswgi_port'],
+        uwsgi_port: site['uwsgi_port'],
         server_name: site['server_name'],
         server_aliases: site['server_alias'],
         allow_override: site['allow_override'],

@@ -25,9 +25,8 @@ if node['pythonstack']['demo']['enabled']
   version1 = '0.0.6'
 
   default['nginx']['sites'][site1]['port']         = 80
-  default['nginx']['sites'][site1]['uswgi_port']   = 8080
+  default['nginx']['sites'][site1]['uwsgi_port']   = 8080
   default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
-  default['nginx']['sites'][site1]['template']     = "nginx2/sites/#{site1}.erb"
   default['nginx']['sites'][site1]['server_name']  = site1
   default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
   default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
