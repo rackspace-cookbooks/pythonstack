@@ -34,7 +34,6 @@ if node['pythonstack']['demo']['enabled']
   default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
   default['nginx']['sites'][site1]['loglevel']     = 'warn'
   default['nginx']['sites'][site1]['app']          = 'demo:app'
-  default['nginx']['sites'][site1]['server_admin'] = 'demo@demo.com'
   default['nginx']['sites'][site1]['revision'] = "v#{version1}"
   default['nginx']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
   default['nginx']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
