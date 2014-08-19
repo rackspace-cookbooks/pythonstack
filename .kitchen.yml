@@ -45,3 +45,6 @@ suites:
         server_debian_password: "randompass"
       holland:
         password: "randompass"
+  - name: application_python_nginx
+    run_list:
+      - recipe[pythonstack::application_python_nginx]
