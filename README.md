@@ -4,6 +4,7 @@
 Supported Platforms
 -------------------
 * Ubuntu 12.04
+* Centos 6.5
 
 Requirements
 ------------
@@ -31,9 +32,17 @@ Recipes
 Includes recipes: platformstack::monitors platformstack::iptables apt apache2::default apache2::mod_wscgi apache2::mod_python
 Creates sites coming from node['apache']['sites'] array
 Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled
+#### nginx
+Includes recipes: platformstack::monitors platformstack::iptables apt/yum-epel nginx::default uwsgi python::package python::pip
+Creates sites coming from node['nginx']['sites'] array
+Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled
 #### application_python
 Includes recipes: git, yum, yum-epel, yum-ius, apt, php, php::ini, php::module_mysql, pythonstack::apache, pythonstack::php_fpm, chef-sugar
 Creates application_deployment configuration, checking out the code from node['apache']['sites']['repository'] and putting into the path specified in node['apache']['sites']['docroot']
+Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini
+#### application_python_nginx
+Includes recipes: git, build-essential, pythonstack::nginx, mysql::client
+Creates application_deployment configuration, checking out the code from node['nginx']['sites']['repository'] and putting into the path specified in node['nginx']['sites']['docroot']
 Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini
 #### mysql_base
 Includes recipe database::mysql, platformstack::monitors, mysql-multi::mysql_base
@@ -100,6 +109,36 @@ Attributes
 * node.default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/php-test-app'
   * Indicates repository variable to be used to deploy this site
 * node.default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+  * Indicates deploy_key variable to be used when getting data from repository
+
+#### nginx.rb
+* site1 = 'example.com'
+  * Indicate the fqdn of the site number 1
+* node.default['nginx']['sites'][site1]['port']         = 80
+  * Indicates what port should be this site listening on
+* node.default['nginx']['sites'][site1]['uwsgi_port']         = 8080
+  * Indicates what port should be the uwsgi service listening on
+* node.default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
+  * Indicates the name of the cookbook to get templates from
+* node.default['nginx']['sites'][site1]['server_name']  = site1
+  * Indicates server_name variable to be used in template file
+* node.default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
+  * Indicates server_alias variable to be used in template file
+* node.default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
+  * Indicates docroot variable to be used in template file
+* node.default['nginx']['sites'][site1]['errorlog']     = "#{node['nginx']['log_dir']}/#{site1}-error.log"
+  * Indicates errorlog variable to be used in template file
+* node.default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
+  * Indicates customlog variable to be used in template file
+* node.default['nginx']['sites'][site1]['loglevel']     = 'warn'
+  * Indicates loglevel variable to be used in template file
+* node.default['nginx']['sites'][site1]['app']     = 'demo:app'
+  * Indicates Python app namespace
+* node.default['nginx']['sites'][site1]['revision'] = "v#{version1}"
+  * Indicates revision variable to be used to deploy this site files
+* node.default['nginx']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
+  * Indicates repository variable to be used to deploy this site
+* node.default['nginx']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
   * Indicates deploy_key variable to be used when getting data from repository
 
 #### holland.rb

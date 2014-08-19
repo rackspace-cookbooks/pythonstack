@@ -49,7 +49,7 @@ suites:
       holland:
         password: "randompass"
 
-  - name: web
+  - name: application_python_apache
     run_list:
       - recipe[pythonstack::application_python]
 
@@ -63,3 +63,7 @@ suites:
         server_debian_password: "randompass"
       holland:
         password: "randompass"
+
+  - name: application_python_nginx
+    run_list:
+      - recipe[pythonstack::application_python_nginx]
