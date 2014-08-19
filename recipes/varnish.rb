@@ -22,6 +22,10 @@ include_recipe 'chef-sugar'
 if platform_family?('debian')
   include_recipe 'apt'
 end
+# needed on cent 6.5 for the jemalloc dep
+if platform_family?('rhel')
+  include_recipe 'yum-epel'
+end
 
 add_iptables_rule('INPUT', "-p tcp --dport #{node['varnish']['listen_port']} -j ACCEPT", 9997, 'allow web browsers to connect')
 
