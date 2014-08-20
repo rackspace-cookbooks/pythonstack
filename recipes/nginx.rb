@@ -26,7 +26,7 @@ if rhel?
   include_recipe 'python::package'
   include_recipe 'python::pip'
   python_pip 'setuptools' do
-        action :upgrade
+    action :upgrade
   end
 elsif debian?
   include_recipe 'apt'
@@ -92,6 +92,12 @@ unless node['nginx']['sites'].nil?
       master true
       die_on_term true
       app site['app']
+    end
+
+    # Reload service if pythonstack.ini has been modified
+    service "uwsgi-#{site_name}" do
+      supports :restart => true, :reload => true
+      subscribes :restart, 'template[pythonstack.ini]', :delayed
     end
 
     # Nginx set up
