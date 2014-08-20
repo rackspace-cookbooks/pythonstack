@@ -26,7 +26,7 @@ if rhel?
   include_recipe 'python::package'
   include_recipe 'python::pip'
   python_pip 'setuptools' do
-        action :upgrade
+    action :upgrade
   end
 elsif debian?
   include_recipe 'apt'
