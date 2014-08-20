@@ -47,4 +47,17 @@ suites:
         password: "randompass"
   - name: application_python_nginx
     run_list:
+      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::memcached]
+      - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python_nginx]
+    attributes:
+      pythonstack:
+        webserver: "nginx"
+      mysql:
+        server_root_password: "randompass"
+        server_repl_password: "randompass"
+        server_debian_password: "randompass"
+      holland:
+        password: "randompass"
