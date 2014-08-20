@@ -92,7 +92,7 @@ unless includes_recipe?('phpstack::mysql_slave')
 
     # required otherwise FC047 thinks we try to set node['pythonstack']['webserver']
     webserver = node['pythonstack']['webserver']
-    normal_unless[webserver]['sites'][site_name]['mysql_password'] = secure_password
+    node.set_unless[webserver]['sites'][site_name]['mysql_password'] = secure_password
     if Chef::Config[:solo]
       Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
       app_nodes = []
