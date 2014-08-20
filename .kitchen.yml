@@ -51,7 +51,7 @@ suites:
       - recipe[pythonstack::memcached]
       - recipe[pythonstack::mysql_master]
       - recipe[pythonstack::rabbitmq]
-      - recipe[pythonstack::application_python_nginx]
+      - recipe[pythonstack::application_python]
     attributes:
       pythonstack:
         webserver: "nginx"

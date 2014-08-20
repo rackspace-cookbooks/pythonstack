@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 include_recipe 'build-essential'
-include_recipe 'pythonstack::apache'
+include_recipe "pythonstack::#{node['pythonstack']['webserver']}"
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python::pip'
@@ -43,16 +43,17 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
-node['apache']['sites'].each do | site_name |
+node[node['pythonstack']['webserver']]['sites'].each do | site_name |
   site_name = site_name[0]
 
   application site_name do
-    path node['apache']['sites'][site_name]['docroot']
-    owner node['apache']['user']
-    group node['apache']['group']
-    deploy_key node['apache']['sites'][site_name]['deploy_key']
-    repository node['apache']['sites'][site_name]['repository']
-    revision node['apache']['sites'][site_name]['revision']
+    path node[node['pythonstack']['webserver']]['sites'][site_name]['docroot']
+    owner node[node['pythonstack']['webserver']]['user']
+    group node[node['pythonstack']['webserver']]['group']
+    deploy_key node[node['pythonstack']['webserver']]['sites'][site_name]['deploy_key']
+    repository node[node['pythonstack']['webserver']]['sites'][site_name]['repository']
+    revision node[node['pythonstack']['webserver']]['sites'][site_name]['revision']
+    restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ]; then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
   end
 end
 
@@ -69,16 +70,16 @@ template 'pythonstack.ini' do
   cookbook node['pythonstack']['ini']['cookbook']
   source 'pythonstack.ini.erb'
   owner 'root'
-  group node['apache']['group']
+  group node[node['pythonstack']['webserver']]['group']
   mode '00640'
   variables(
     cookbook_name: cookbook_name,
     # if it responds then we will create the config section in the ini file
     mysql: if mysql_node.respond_to?('deep_fetch')
-             if mysql_node.deep_fetch('apache', 'sites').nil?
+             if mysql_node.deep_fetch(node['pythonstack']['webserver'], 'sites').nil?
                nil
              else
-               mysql_node.deep_fetch('apache', 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
+               mysql_node.deep_fetch(node['pythonstack']['webserver'], 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
              end
            end,
     mysql_master_host: if mysql_node.respond_to?('deep_fetch')
@@ -107,7 +108,7 @@ node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email
 node.default['rackspace_cloudbackup']['backups'] =
   [
     {
-      location: node['apache']['docroot_dir'],
+      location: node[node['pythonstack']['webserver']]['docroot_dir'],
       enable: node['pythonstack']['rackspace_cloudbackup']['http_docroot']['enable'],
       comment: 'Web Content Backup',
       cloud: { notify_email: node['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] }
