@@ -82,7 +82,7 @@ search_add_iptables_rules(
 
 # we don't want to create DBs or users and the like on slaves, do we?
 unless includes_recipe?('phpstack::mysql_slave')
-  node['apache']['sites'].each do |site_name|
+  node[node['pythonstack']['webserver']]['sites'].each do |site_name|
     site_name = site_name[0]
 
     mysql_database site_name do
@@ -90,7 +90,7 @@ unless includes_recipe?('phpstack::mysql_slave')
       action 'create'
     end
 
-    node.set_unless['apache']['sites'][site_name]['mysql_password'] = secure_password
+    node.set_unless[node['pythonstack']['webserver']]['sites'][site_name]['mysql_password'] = secure_password
     if Chef::Config[:solo]
       Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
       app_nodes = []
@@ -101,7 +101,7 @@ unless includes_recipe?('phpstack::mysql_slave')
     app_nodes.each do |app_node|
       mysql_database_user site_name do
         connection connection_info
-        password node['apache']['sites'][site_name]['mysql_password']
+        password node[node['pythonstack']['webserver']]['sites'][site_name]['mysql_password']
         host best_ip_for(app_node)
         database_name site_name
         privileges %w(select update insert)

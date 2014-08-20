@@ -1,5 +1,5 @@
 server {
-  listen  <%= @server_port || node['apache']['listen_ports'].first %>;
+  listen  <%= @server_port || node['nginx']['listen_ports'].first %>;
   server_name  <%= @server_name %> <% @server_aliases.each do |a| %><%= a %> <% end %>;
   access_log  <%= node['nginx']['log_dir'] %>/<%= @name %>-access.log;
   error_log  <%= node['nginx']['log_dir'] %>/<%= @name %>-error.log info;

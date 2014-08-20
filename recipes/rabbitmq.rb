@@ -34,7 +34,7 @@ node.default['rabbitmq']['job_control'] = 'upstart'
 
 include_recipe 'rabbitmq'
 
-node['apache']['sites'].each do |site_name|
+node[node['pythonstack']['webserver']]['sites'].each do |site_name|
   site_name = site_name[0]
 
   # create the rabbit vhost
