@@ -43,6 +43,8 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 
+python_pip 'pymongo'
+
 node['nginx']['sites'].each do | site_name |
   site_name = site_name[0]
 

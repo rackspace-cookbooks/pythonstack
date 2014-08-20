@@ -42,6 +42,7 @@ python_pip 'gunicorn'
 python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
+python_pip 'pymongo'
 
 node['apache']['sites'].each do | site_name |
   site_name = site_name[0]
