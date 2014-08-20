@@ -99,7 +99,8 @@ template 'pythonstack.ini' do
                       end
   )
   action 'create'
-  notifies 'restart', 'service[apache2]', 'delayed'
+  # For Nginx the service Uwsgi subscribes to the template, as we need to restart each Uwsgi service
+  notifies 'restart', 'service[apache2]', 'delayed' unless node['pythonstack']['webserver'] == 'nginx'
 end
 
 # backups
