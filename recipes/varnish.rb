@@ -26,7 +26,7 @@ end
 add_iptables_rule('INPUT', "-p tcp --dport #{node['varnish']['listen_port']} -j ACCEPT", 9997, 'allow web browsers to connect')
 
 # set the default port to send things on to something that might be useful
-node.default['varnish']['backend_port'] = node['apache']['listen_ports'].first
+node.default['varnish']['backend_port'] = node[node['pythonstack']['webserver']]['listen_ports'].first
 
 # pull a list of backend hosts to populate the template
 # node.default['pythonstack']['varnish']['backend_hosts'] = Hash.new
@@ -39,13 +39,13 @@ else
 end
 
 backend_nodes.each do |backend_node|
-  if backend_node.deep_fetch('apache', 'sites').nil?
+  if backend_node.deep_fetch(node['pythonstack']['webserver'], 'sites').nil?
     errmsg = 'Did not find sites, default.vcl not configured'
     Chef::Log.warn(errmsg)
   else
-    backend_node['apache']['sites'].each do |site_name|
+    backend_node[node['pythonstack']['webserver']]['sites'].each do |site_name|
       site_name = site_name[0]
-      site = backend_node['apache']['sites'][site_name]
+      site = backend_node[node['pythonstack']['webserver']]['sites'][site_name]
       backend_hosts.merge!(
         best_ip_for(backend_node) => {
           site['port'] => {

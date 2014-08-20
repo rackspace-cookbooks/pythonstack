@@ -19,6 +19,7 @@
 #
 
 default['nginx']['default_site_enabled'] = false
+default['nginx']['listen_ports'] = %w(80)
 
 if node['pythonstack']['demo']['enabled']
   site1 = 'example.com'

@@ -9,21 +9,21 @@ Supported Platforms
 Requirements
 ------------
 #### Cookbooks
-  
-* `git` 
-* `rackops_rolebook`  
-* `yum`  
-* `apt`  
-* `chef-sugar`  
-* `platformstack::monitors`  
-* `platformstack::iptables`  
-* `apache2`  
-* `apache2::mod_wscgi`  
-* `database::mysql`  
+
+* `git`
+* `rackops_rolebook`
+* `yum`
+* `apt`
+* `chef-sugar`
+* `platformstack::monitors`
+* `platformstack::iptables`
+* `apache2`
+* `apache2::mod_wscgi`
+* `database::mysql`
 * `mysql`
 * `mysql-multi`
 * `postgresql`
-* `pg-multi`  
+* `pg-multi`
 
 Recipes
 ----------
@@ -36,12 +36,8 @@ Creates monitoring check for each site if node[platformstack][cloud_monitoring] 
 Includes recipes: platformstack::monitors platformstack::iptables apt/yum-epel nginx::default uwsgi python::package python::pip
 Creates sites coming from node['nginx']['sites'] array
 Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled
-#### application_python
-Includes recipes: git, yum, yum-epel, yum-ius, apt, php, php::ini, php::module_mysql, pythonstack::apache, pythonstack::php_fpm, chef-sugar
-Creates application_deployment configuration, checking out the code from node['apache']['sites']['repository'] and putting into the path specified in node['apache']['sites']['docroot']
-Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini
 #### application_python_nginx
-Includes recipes: git, build-essential, pythonstack::nginx, mysql::client
+Includes recipes: git, build-essential, pythonstack::(webserver), mysql::client
 Creates application_deployment configuration, checking out the code from node['nginx']['sites']['repository'] and putting into the path specified in node['nginx']['sites']['docroot']
 Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini
 #### mysql_base
@@ -79,6 +75,10 @@ No Data_Bag configured for this cookbook
 Attributes
 ----------
 
+#### default.rb
+* node.default['pythonstack']['webserver'] = apache
+  * Indicate which webserver to use, currently Nginx/Apache
+
 #### apache.rb
 * site1 = 'example.com'
   * Indicate the fqdn of the site number 1
@@ -112,6 +112,10 @@ Attributes
   * Indicates deploy_key variable to be used when getting data from repository
 
 #### nginx.rb
+* node.default['nginx']['default_site_enabled'] = false
+  * Disabled the default website
+* node.default['nginx']['listen_ports'] = %w(80)
+  * Give a list of ports Nginx listen on, it's in the default apache2 cookbook, but not in the Nginx one, which is why we have to add it manually
 * site1 = 'example.com'
   * Indicate the fqdn of the site number 1
 * node.default['nginx']['sites'][site1]['port']         = 80
@@ -183,7 +187,7 @@ Attributes
 * default['postgresql']['password']['postgres'] = 'randompasswordforpostgresql'
   * Indicates admin password for postgresql
 * default['pg-multi']['replication']['user'] = 'repl'
-  * Used to customize replication username. 
+  * Used to customize replication username.
 * default['pg-multi']['replication']['password'] = 'useagudpasswd'
   * Used to set replication user password
 * default['pg-multi']['master_ip'] = ''
