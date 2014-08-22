@@ -82,7 +82,7 @@ unless node['nginx']['sites'].nil?
 
     template "#{site_name}-uwsgi-ini" do
       cookbook 'pythonstack'
-      source "nginx/uwsgi.ini.erb"
+      source 'nginx/uwsgi.ini.erb'
       path "#{node['nginx']['dir']}/#{site_name}.ini"
       owner 'root'
       group 'root'

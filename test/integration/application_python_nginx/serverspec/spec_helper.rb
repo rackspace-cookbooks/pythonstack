@@ -11,6 +11,6 @@ RSpec.configure do |c|
   end
 end
 
-def page_returns(url='http://localhost/')
+def page_returns(url = 'http://localhost/')
   Net::HTTP.get(URI(url))
 end

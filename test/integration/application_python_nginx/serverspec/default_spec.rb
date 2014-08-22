@@ -36,7 +36,7 @@ describe 'configures our application' do
     it { should be_linked_to '/etc/nginx/sites-available/example.com' }
   end
   describe file('/var/www/nginx-default/example.com') do
-      it { should be_directory }
+    it { should be_directory }
   end
   describe file('/etc/pythonstack.ini') do
     it { should be_file }
