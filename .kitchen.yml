@@ -39,7 +39,9 @@ suites:
       - recipe[pythonstack::memcached]
       - recipe[pythonstack::redis_base]
       - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::postgresql_base]
       - recipe[pythonstack::rabbitmq]
+      - recipe[phpstack::mongodb_standalone]
       - recipe[pythonstack::application_python]
     attributes:
       mysql:
@@ -63,6 +65,10 @@ suites:
         server_debian_password: "randompass"
       holland:
         password: "randompass"
+
+  - name: postgresql
+    run_list:
+      - recipe[pythonstack::postgresql_base]
 
   - name: application_python_nginx
     run_list:
