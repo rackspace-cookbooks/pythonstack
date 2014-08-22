@@ -6,7 +6,7 @@ workers = 2
 socket = 127.0.0.1:<%= @uwsgi_port %>
 pidfile = <%= @pid_path %>
 
-chdir = <%= @home_path %>
+; chdir = <%= @home_path %>
 module = <%= @app %>
 
 uid = <%= @uid %>
