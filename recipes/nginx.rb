@@ -109,7 +109,7 @@ unless node['nginx']['sites'].nil?
 
     # Reload service if pythonstack.ini has been modified
     service "uwsgi-#{site_name}" do
-      supports :restart => true, :reload => true
+      supports restart: true, reload: true
       subscribes :restart, 'template[pythonstack.ini]', :delayed
     end
 

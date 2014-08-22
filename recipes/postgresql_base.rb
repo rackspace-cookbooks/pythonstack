@@ -7,6 +7,7 @@
 
 include_recipe 'chef-sugar'
 include_recipe 'platformstack::iptables'
+include_recipe 'platformstack::monitors'
 
 include_recipe 'pg-multi'
 

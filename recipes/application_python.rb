@@ -54,7 +54,8 @@ node[node['pythonstack']['webserver']]['sites'].each do | site_name |
     deploy_key node[node['pythonstack']['webserver']]['sites'][site_name]['deploy_key']
     repository node[node['pythonstack']['webserver']]['sites'][site_name]['repository']
     revision node[node['pythonstack']['webserver']]['sites'][site_name]['revision']
-    restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null; then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
+    restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
+    then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
   end
 end
 
