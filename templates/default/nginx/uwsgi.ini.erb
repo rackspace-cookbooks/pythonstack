@@ -1,0 +1,38 @@
+[uwsgi]
+master = true
+die-on-term = true
+
+workers = 2
+socket = 127.0.0.1:<%= @uwsgi_port %>
+pidfile = <%= @pid_path %>
+
+; chdir = <%= @home_path %>
+module = <%= @app %>
+
+uid = <%= @uid %>
+gid = <%= @gid %>
+
+disable-logging = false
+harakiri = 60
+harakiri-verbose = true
+
+<% if node['newrelic']['license'] %>
+; The following is needed for NewRelic to work correctly
+; https://docs.newrelic.com/docs/agents/python-agent/hosting-mechanisms/python-agent-and-uwsgi#mandatory-options
+single-interpreter = true
+enable-threads = true
+env = NEW_RELIC_CONFIG_FILE= <%= node['newrelic']['python-agent']['config_file'] %>
+env = NEW_RELIC_LICENSE_KEY= <%= node['newrelic']['license'] %>
+<% end %>
+
+<% if @stats_port %>
+stats = :<%= @stats_port %>
+<% end -%>
+
+logto = <%= node['nginx']['log_dir'] %>/<%= @name %>_uwsgi.log
+
+<%
+@options.each do |key, value|
+%>
+<%= key -%> = <%= value %>
+<% end -%>
