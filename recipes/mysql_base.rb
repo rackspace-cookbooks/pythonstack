@@ -81,7 +81,7 @@ search_add_iptables_rules(
   'allow app nodes to connect to mysql')
 
 # we don't want to create DBs or users and the like on slaves, do we?
-unless includes_recipe?('phpstack::mysql_slave')
+unless includes_recipe?('pythonstack::mysql_slave')
   node[node['pythonstack']['webserver']]['sites'].each do |site_name|
     site_name = site_name[0]
 

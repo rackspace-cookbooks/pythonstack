@@ -20,7 +20,7 @@
 
 include_recipe 'platformstack::iptables'
 
-# allow application_php nodes to connect
+# allow application_python nodes to connect
 node.default['rabbitmq']['port'] = '5672' if node['rabbitmq']['port'].nil?
 search_add_iptables_rules("tags:python_app_node AND chef_environment:#{node.chef_environment}",
                           'INPUT',

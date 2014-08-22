@@ -106,7 +106,7 @@ Attributes
   * Indicates server_admin variable to be used in template file
 * node.default['apache']['sites'][site1]['revision'] = "v#{version1}"
   * Indicates revision variable to be used to deploy this site files
-* node.default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/php-test-app'
+* node.default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
   * Indicates repository variable to be used to deploy this site
 * node.default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
   * Indicates deploy_key variable to be used when getting data from repository

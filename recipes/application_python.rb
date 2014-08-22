@@ -64,7 +64,7 @@ if Chef::Config[:solo]
   mysql_node = nil
   rabbit_node = nil
 else
-  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_base AND chef_environment:#{node.chef_environment}").first
+  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_master AND chef_environment:#{node.chef_environment}").first
   rabbit_node = search('node', "recipes:pythonstack\\:\\:rabbitmq AND chef_environment:#{node.chef_environment}").first
 end
 template 'pythonstack.ini' do
