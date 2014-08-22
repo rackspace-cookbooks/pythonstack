@@ -41,7 +41,7 @@ suites:
       - recipe[pythonstack::mysql_master]
       - recipe[pythonstack::postgresql_base]
       - recipe[pythonstack::rabbitmq]
-      - recipe[phpstack::mongodb_standalone]
+      - recipe[pythonstack::mongodb_standalone]
       - recipe[pythonstack::application_python]
     attributes:
       mysql:
