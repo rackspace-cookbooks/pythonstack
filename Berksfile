@@ -12,9 +12,8 @@ cookbook 'monit', git: 'git@github.com:apsoto/monit.git'
 cookbook 'redis-multi', git: 'git@github.com:rackspace-cookbooks/redis-multi'
 cookbook 'redisio', git: 'https://github.com/racker/redisio', branch: '2.0.0_wip'
 cookbook 'uwsgi', git: 'https://github.com/50onRed/uwsgi'
-group :integration do
-#  cookbook 'phpstack_test_app', path: 'test/fixtures/cookbooks/phpstack_test_app'
 
+group :integration do
   cookbook 'apt'
   cookbook 'yum'
 end
