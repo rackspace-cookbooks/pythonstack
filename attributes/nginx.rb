@@ -27,6 +27,8 @@ if node['pythonstack']['demo']['enabled']
 
   default['nginx']['sites'][site1]['port']         = 80
   default['nginx']['sites'][site1]['uwsgi_port']   = 8080
+  default['nginx']['sites'][site1]['uwsgi_stats_port']   = '1717'
+  default['nginx']['sites'][site1]['uwsgi_options']   = {}
   default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
   default['nginx']['sites'][site1]['server_name']  = site1
   default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]

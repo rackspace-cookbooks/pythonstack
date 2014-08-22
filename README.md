@@ -122,6 +122,10 @@ Attributes
   * Indicates what port should be this site listening on
 * node.default['nginx']['sites'][site1]['uwsgi_port']         = 8080
   * Indicates what port should be the uwsgi service listening on
+* node.default['nginx']['sites'][site1]['uwsgi_stats_port']         = '1717'
+  * Indicates what port should be the uwsgi stats service listening on
+* node.default['nginx']['sites'][site1]['uwsgi_options']         = { 'myoption' => 'myvalue'}
+  * Add some other options to the Uwsgi ini configuration file
 * node.default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
   * Indicates the name of the cookbook to get templates from
 * node.default['nginx']['sites'][site1]['server_name']  = site1

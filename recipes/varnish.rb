@@ -23,6 +23,10 @@ if platform_family?('debian')
   include_recipe 'apt'
 end
 
+if rhel?
+  include_recipe 'yum-epel'
+end
+
 add_iptables_rule('INPUT', "-p tcp --dport #{node['varnish']['listen_port']} -j ACCEPT", 9997, 'allow web browsers to connect')
 
 # set the default port to send things on to something that might be useful
