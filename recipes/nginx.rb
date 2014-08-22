@@ -80,18 +80,31 @@ unless node['nginx']['sites'].nil?
       node.default['nginx']['uwsgi']['bin'] = '/usr/local/bin/uwsgi'
     end
 
+    template "#{site_name}-uwsgi-ini" do
+      cookbook 'pythonstack'
+      source "nginx/uwsgi.ini.erb"
+      path "#{node['nginx']['dir']}/#{site_name}.ini"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        name: site_name,
+        home_path: "#{site['docroot']}/current",
+        pid_path: "/var/run/uwsgi-#{site_name}.pid",
+        uwsgi_port: site['uwsgi_port'],
+        stats_port: site['uwsgi_stats_port'],
+        app: site['app'],
+        uid: node['nginx']['user'],
+        gid: node['nginx']['group'],
+        options: site['uwsgi_options']
+      )
+    end
+
     uwsgi_service site_name do
+      pid_path "/var/run/uwsgi-#{site_name}.pid"
       home_path "#{site['docroot']}/current"
       uwsgi_bin node['nginx']['uwsgi']['bin'] if node['nginx']['uwsgi']['bin']
-      uid node['nginx']['user']
-      gid node['nginx']['group']
-      pid_path "/var/run/uwsgi-#{site_name}.pid"
-      host '127.0.0.1'
-      port site['uwsgi_port']
-      worker_processes 2
-      master true
-      die_on_term true
-      app site['app']
+      config_file "#{node['nginx']['dir']}/#{site_name}.ini"
     end
 
     # Reload service if pythonstack.ini has been modified
