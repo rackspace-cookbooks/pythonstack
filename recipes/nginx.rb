@@ -113,7 +113,7 @@ unless node['nginx']['sites'].nil?
 
     # Nginx set up
     template site_name do
-      cookbook 'pythonstack'
+      cookbook site_opts['cookbook']
       source "nginx/sites/#{site_name}.erb"
       path "#{node['nginx']['dir']}/sites-available/#{site_name}"
       owner 'root'
