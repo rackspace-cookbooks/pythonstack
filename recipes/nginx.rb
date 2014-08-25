@@ -61,16 +61,14 @@ end
 
 # Create the sites.
 unless node['nginx']['sites'].nil?
-  node['nginx']['sites'].each do | site_name |
-    site_name = site_name[0]
-    site = node['nginx']['sites'][site_name]
-    add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site['port']} -j ACCEPT", 100, 'Allow access to nginx')
+  node['nginx']['sites'].each do |site_name, site_opts|
+    add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site_opts['port']} -j ACCEPT", 100, 'Allow access to nginx')
 
     if rhel?
       # Uwsgi path is different on Centos
       node.default['nginx']['uwsgi']['bin'] = '/usr/bin/uwsgi'
       # Create Docroot if missing (Redhat Nginx package default to /usr/share/html which we don't want to use to deploy)
-      directory site['docroot'] do
+      directory site_opts['docroot'] do
         owner node['nginx']['user']
         group node['nginx']['group']
         action :create
@@ -89,20 +87,20 @@ unless node['nginx']['sites'].nil?
       mode '0644'
       variables(
         name: site_name,
-        home_path: "#{site['docroot']}/current",
+        home_path: "#{site_opts['docroot']}/current",
         pid_path: "/var/run/uwsgi-#{site_name}.pid",
-        uwsgi_port: site['uwsgi_port'],
-        stats_port: site['uwsgi_stats_port'],
-        app: site['app'],
+        uwsgi_port: site_opts['uwsgi_port'],
+        stats_port: site_opts['uwsgi_stats_port'],
+        app: site_opts['app'],
         uid: node['nginx']['user'],
         gid: node['nginx']['group'],
-        options: site['uwsgi_options']
+        options: site_opts['uwsgi_options']
       )
     end
 
     uwsgi_service site_name do
       pid_path "/var/run/uwsgi-#{site_name}.pid"
-      home_path "#{site['docroot']}/current"
+      home_path "#{site_opts['docroot']}/current"
       uwsgi_bin node['nginx']['uwsgi']['bin'] if node['nginx']['uwsgi']['bin']
       config_file "#{node['nginx']['dir']}/#{site_name}.ini"
     end
@@ -115,7 +113,7 @@ unless node['nginx']['sites'].nil?
 
     # Nginx set up
     template site_name do
-      cookbook 'pythonstack'
+      cookbook site_opts['cookbook']
       source "nginx/sites/#{site_name}.erb"
       path "#{node['nginx']['dir']}/sites-available/#{site_name}"
       owner 'root'
@@ -123,30 +121,30 @@ unless node['nginx']['sites'].nil?
       mode '0644'
       variables(
         name: site_name,
-        port: site['port'],
-        uwsgi_port: site['uwsgi_port'],
-        server_name: site['server_name'],
-        server_aliases: site['server_alias'],
-        allow_override: site['allow_override'],
-        errorlog: site['errorlog'],
-        customlog: site['customlog'],
-        loglevel: site['loglevel']
+        port: site_opts['port'],
+        uwsgi_port: site_opts['uwsgi_port'],
+        server_name: site_opts['server_name'],
+        server_aliases: site_opts['server_alias'],
+        allow_override: site_opts['allow_override'],
+        errorlog: site_opts['errorlog'],
+        customlog: site_opts['customlog'],
+        loglevel: site_opts['loglevel']
       )
       notifies :reload, 'service[nginx]'
     end
     nginx_site site_name do
       enable true
     end
-    template "http-monitor-#{site['server_name']}" do
+    template "http-monitor-#{site_opts['server_name']}" do
       cookbook 'pythonstack'
       source 'monitoring-remote-http.yaml.erb'
-      path "/etc/rackspace-monitoring-agent.conf.d/#{site['server_name']}-http-monitor.yaml"
+      path "/etc/rackspace-monitoring-agent.conf.d/#{site_opts['server_name']}-http-monitor.yaml"
       owner 'root'
       group 'root'
       mode '0644'
       variables(
-        http_port: site['port'],
-        server_name: site['server_name']
+        http_port: site_opts['port'],
+        server_name: site_opts['server_name']
       )
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
       action 'create'
