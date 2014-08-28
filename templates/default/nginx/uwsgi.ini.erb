@@ -21,8 +21,8 @@ harakiri-verbose = true
 ; https://docs.newrelic.com/docs/agents/python-agent/hosting-mechanisms/python-agent-and-uwsgi#mandatory-options
 single-interpreter = true
 enable-threads = true
-env = NEW_RELIC_CONFIG_FILE= <%= node['newrelic']['python_agent']['config_file'] %>
-env = NEW_RELIC_LICENSE_KEY= <%= node['newrelic']['license'] %>
+env = NEW_RELIC_CONFIG_FILE=<%= node['newrelic']['python_agent']['config_file'] %>
+env = NEW_RELIC_LICENSE_KEY=<%= node['newrelic']['license'] %>
 <% end %>
 
 <% if @stats_port %>
