@@ -68,6 +68,11 @@ if node['newrelic']['license']
       notifies :reload, 'service[nginx]'
     end
 
+    nginx_site 'monitor' do
+      enable true
+      notifies :reload, 'service[nginx]'
+    end
+
     meetme_config['nginx'] = {
       'name' => node['hostname'],
       'host' => 'localhost',
