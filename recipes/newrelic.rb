@@ -36,27 +36,53 @@ if node['newrelic']['license']
   end
 
   if node['recipes'].include?('rabbitmq')
+    # needs to be run before hand to set attributes
+    include_recipe 'pythonstack::rabbitmq'
+
+    ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+    node.set_unless['pythonstack']['rabbitmq']['monitor_password'] = secure_password
+    rabbitmq_user 'monitor' do
+      action %w(add set_permissions change_password)
+      permissions '.* .* .*'
+      password node['pythonstack']['rabbitmq']['monitor_password']
+    end
+
     meetme_config['rabbitmq'] = {
-      'name' => node['hostname'],
-      'host' => 'localhost',
-      'port' => 15_672,
-      'username' => 'guest',
-      'password' => 'guest',
-      'api_path' => '/api'
+      name: node['hostname'],
+      host: 'localhost',
+      port: node['rabbitmq']['port'],
+      username: 'monitor',
+      password: node['pythonstack']['rabbitmq']['monitor_password'],
+      api_path: '/api'
     }
   end
 
   if node['recipes'].include?('nginx')
+    template 'nginx-monitor' do
+      cookbook 'pythonstack'
+      source 'nginx/sites/monitor.erb'
+      path "#{node['nginx']['dir']}/sites-available/monitor.conf"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      notifies :reload, 'service[nginx]'
+    end
+
+    nginx_site 'monitor' do
+      enable true
+      notifies :reload, 'service[nginx]'
+    end
+
     meetme_config['nginx'] = {
       'name' => node['hostname'],
       'host' => 'localhost',
-      'port' => 80,
+      'port' => node['nginx']['status']['port'],
       'path' => '/server-status'
     }
     meetme_config['uwsgi'] = {
       'name' => node['hostname'],
       'host' => 'localhost',
-      'port' => 1717
+      'port' => node['nginx']['sites'].values[0]['uwsgi_port']
     }
   end
   node.override['newrelic_meetme_plugin']['services'] = meetme_config

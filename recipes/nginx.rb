@@ -134,6 +134,7 @@ unless node['nginx']['sites'].nil?
     end
     nginx_site site_name do
       enable true
+      notifies :reload, 'service[nginx]'
     end
     template "http-monitor-#{site_opts['server_name']}" do
       cookbook 'pythonstack'
