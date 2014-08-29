@@ -1,17 +1,12 @@
 server {
-  listen  <%= @server_port || node['nginx']['listen_ports'].first %>;
-  server_name  <%= @server_name %> <% @server_aliases.each do |a| %><%= a %> <% end %>;
-  access_log  <%= node['nginx']['log_dir'] %>/<%= @name %>-access.log;
-  error_log  <%= node['nginx']['log_dir'] %>/<%= @name %>-error.log info;
+  listen  127.0.0.1:<%= node['nginx']['status']['port'] %>;
+  server_name _;
   location /server-status {
         stub_status on;
         allow 127.0.0.1;
         deny all;
         access_log off;
   }
-  location / {
-            uwsgi_pass 127.0.0.1:<%= @uwsgi_port %>;
-            include uwsgi_params;
-  }
-
+  stub_status on;
+  access_log off;
 }
