@@ -24,6 +24,54 @@ if node['newrelic']['license']
   node.override['newrelic']['server_monitoring']['ssl'] = true
   include_recipe 'platformstack::default'
   include_recipe 'newrelic::python_agent'
+  node.default['newrelic_meetme_plugin']['license'] = node['newrelic']['license']
+
+  meetme_config = {}
+  if node['recipes'].include?('memcached')
+    meetme_config['memcached'] = {
+      'name' => node['hostname'],
+      'host' => 'localhost',
+      'port' => 11_211
+    }
+  end
+
+  if node['recipes'].include?('rabbitmq')
+    meetme_config['rabbitmq'] = {
+      'name' => node['hostname'],
+      'host' => 'localhost',
+      'port' => 15_672,
+      'username' => 'guest',
+      'password' => 'guest',
+      'api_path' => '/api'
+    }
+  end
+
+  if node['recipes'].include?('nginx')
+    meetme_config['nginx'] = {
+      'name' => node['hostname'],
+      'host' => 'localhost',
+      'port' => 80,
+      'path' => '/server-status'
+    }
+    meetme_config['uwsgi'] = {
+      'name' => node['hostname'],
+      'host' => 'localhost',
+      'port' => 1717
+    }
+  end
+  node.override['newrelic_meetme_plugin']['services'] = meetme_config
+
+  node.default['newrelic_meetme_plugin']['package_name'] = 'newrelic-plugin-agent'
+
+  include_recipe 'python::package'
+  include_recipe 'python::pip'
+  python_pip 'setuptools' do
+    action :upgrade
+    version node['python']['setuptools_version']
+  end
+
+  include_recipe 'python'
+  include_recipe 'newrelic_meetme_plugin'
 else
   Chef::Log.warn('The New Relic license attribute is not set!')
 end
