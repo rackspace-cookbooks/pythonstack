@@ -44,16 +44,40 @@ python_pip 'MySQL-python' do
 end
 python_pip 'pymongo'
 
-node[node['pythonstack']['webserver']]['sites'].each do | site_name |
-  site_name = site_name[0]
+# if gluster is in our environment, install the utils and mount it to /var/www
+gluster_cluster = node['rackspace_gluster']['config']['server']['glusters'].values[0]
+if gluster_cluster.key?('nodes')
+  # get the list of gluster servers and pick one randomly to use as the one we connect to
+  gluster_ips = []
+  if gluster_cluster['nodes'].respond_to?('each')
+    gluster_cluster['nodes'].each do |server|
+      gluster_ips.push(server[1]['ip'])
+    end
+  end
+  node.set_unless['pythonstack']['gluster_connect_ip'] = gluster_ips.sample
 
+  # install gluster mount
+  package 'glusterfs-client' do
+    action :install
+  end
+
+  # set up the mountpoint
+  mount 'webapp-mountpoint' do
+    fstype 'glusterfs'
+    device "#{node['pythonstack']['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
+    mount_point node['apache']['docroot_dir']
+    action %w(mount enable)
+  end
+end
+
+node[node['pythonstack']['webserver']]['sites'].each do | site_name, site_opts |
   application site_name do
-    path node[node['pythonstack']['webserver']]['sites'][site_name]['docroot']
+    path site_opts['docroot']
     owner node[node['pythonstack']['webserver']]['user']
     group node[node['pythonstack']['webserver']]['group']
-    deploy_key node[node['pythonstack']['webserver']]['sites'][site_name]['deploy_key']
-    repository node[node['pythonstack']['webserver']]['sites'][site_name]['repository']
-    revision node[node['pythonstack']['webserver']]['sites'][site_name]['revision']
+    deploy_key site_opts['deploy_key']
+    repository site_opts['repository']
+    revision site_opts['revision']
     restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
     then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
   end
