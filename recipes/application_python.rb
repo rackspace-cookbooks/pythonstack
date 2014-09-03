@@ -44,6 +44,32 @@ python_pip 'MySQL-python' do
 end
 python_pip 'pymongo'
 
+# if gluster is in our environment, install the utils and mount it to /var/www
+gluster_cluster = node['rackspace_gluster']['config']['server']['glusters'].values[0]
+if gluster_cluster.key?('nodes')
+  # get the list of gluster servers and pick one randomly to use as the one we connect to
+  gluster_ips = []
+  if gluster_cluster['nodes'].respond_to?('each')
+    gluster_cluster['nodes'].each do |server|
+      gluster_ips.push(server[1]['ip'])
+    end
+  end
+  node.set_unless['pythonstack']['gluster_connect_ip'] = gluster_ips.sample
+
+  # install gluster mount
+  package 'glusterfs-client' do
+    action :install
+  end
+
+  # set up the mountpoint
+  mount 'webapp-mountpoint' do
+    fstype 'glusterfs'
+    device "#{node['pythonstack']['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
+    mount_point node['apache']['docroot_dir']
+    action %w(mount enable)
+  end
+end
+
 node[node['pythonstack']['webserver']]['sites'].each do | site_name, site_opts |
   application site_name do
     path site_opts['docroot']
