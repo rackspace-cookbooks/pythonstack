@@ -44,16 +44,14 @@ python_pip 'MySQL-python' do
 end
 python_pip 'pymongo'
 
-node[node['pythonstack']['webserver']]['sites'].each do | site_name |
-  site_name = site_name[0]
-
+node[node['pythonstack']['webserver']]['sites'].each do | site_name, site_opts |
   application site_name do
-    path node[node['pythonstack']['webserver']]['sites'][site_name]['docroot']
+    path site_opts['docroot']
     owner node[node['pythonstack']['webserver']]['user']
     group node[node['pythonstack']['webserver']]['group']
-    deploy_key node[node['pythonstack']['webserver']]['sites'][site_name]['deploy_key']
-    repository node[node['pythonstack']['webserver']]['sites'][site_name]['repository']
-    revision node[node['pythonstack']['webserver']]['sites'][site_name]['revision']
+    deploy_key site_name['deploy_key']
+    repository site_name['repository']
+    revision site_name['revision']
     restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
     then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
   end
