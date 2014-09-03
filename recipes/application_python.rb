@@ -75,9 +75,9 @@ node[node['pythonstack']['webserver']]['sites'].each do | site_name, site_opts |
     path site_opts['docroot']
     owner node[node['pythonstack']['webserver']]['user']
     group node[node['pythonstack']['webserver']]['group']
-    deploy_key site_name['deploy_key']
-    repository site_name['repository']
-    revision site_name['revision']
+    deploy_key site_opts['deploy_key']
+    repository site_opts['repository']
+    revision site_opts['revision']
     restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
     then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
   end
