@@ -35,13 +35,13 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[pythonstack::varnish]
-      - recipe[pythonstack::memcached]
-      - recipe[pythonstack::redis_single]
-      - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::mysql_base]
       - recipe[pythonstack::postgresql_base]
-      - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::mongodb_standalone]
+      - recipe[pythonstack::memcached]
+      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::rabbitmq]
+      - recipe[pythonstack::redis_single]
       - recipe[pythonstack::application_python]
     attributes:
       mysql:
@@ -72,9 +72,9 @@ suites:
 
   - name: application_python_nginx
     run_list:
-      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::mysql_base]
       - recipe[pythonstack::memcached]
-      - recipe[pythonstack::mysql_master]
+      - recipe[pythonstack::varnish]
       - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python]
     attributes:
