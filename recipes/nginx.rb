@@ -122,6 +122,7 @@ node['nginx']['sites'].each do |site_name, site_opts|
     group 'root'
     mode '0644'
     variables(
+      name: site_name,
       port: site_opts['port'],
       uwsgi_port: site_opts['uwsgi_port'],
       server_name: site_opts['server_name'],
