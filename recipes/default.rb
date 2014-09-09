@@ -17,3 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+if node['pythonstack']['monitoring']['enabled']
+  if node['pythonstack']['monitoring']['newrelic']
+    include_recipe 'pythonstack::newrelic'
+  end
+end
