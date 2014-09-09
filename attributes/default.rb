@@ -20,3 +20,8 @@
 
 node.set['pythonstack']['newrelic']['application_monitoring'] = ''
 node.default['pythonstack']['webserver'] = 'apache'
+
+# flags
+default['pythonstack']['monitoring']['enabled'] = false
+default['pythonstack']['monitoring']['newrelic'] = false
+default['pythonstack']['monitoring']['cloudmonitoring'] = false
