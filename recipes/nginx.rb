@@ -150,6 +150,7 @@ unless node['nginx']['sites'].nil?
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
       action 'create'
       only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+      only_if { node['pythonstack']['monitoring']['cloudmonitoring'] }
     end
   end
 end
