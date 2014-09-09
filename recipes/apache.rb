@@ -25,6 +25,13 @@ if rhel?
   include_recipe 'yum-ius'
 end
 
+# If not defined drop out
+if node.deep_fetch('apache', 'sites').nil?
+  return 0
+elsif node.deep_fetch('apache', 'sites').values[0].nil?
+  return 0
+end
+
 # Include the necessary recipes.
 %w(
   platformstack::monitors
@@ -47,7 +54,7 @@ listen_ports = []
 node['apache']['sites'].each do |site_name, site_opts|
   listen_ports.push(site_opts['port']) unless listen_ports.include? site_opts['port']
 
-  add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site_opts['port']} -j ACCEPT", 100, 'Allow access to apache')
+  add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site_opts['port']} -j ACCEPT", 100, 'Allow access to apache') unless site_opts['port'].nil?
 
   web_app site_name do
     port site_opts['port']

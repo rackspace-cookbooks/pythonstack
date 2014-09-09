@@ -19,25 +19,3 @@
 #
 
 default['nginx']['default_site_enabled'] = false
-default['nginx']['listen_ports'] = %w(80)
-
-if node['pythonstack']['demo']['enabled']
-  site1 = 'example.com'
-  version1 = '0.0.6'
-
-  default['nginx']['sites'][site1]['port']         = 80
-  default['nginx']['sites'][site1]['uwsgi_port']   = 8080
-  default['nginx']['sites'][site1]['uwsgi_stats_port']   = '1717'
-  default['nginx']['sites'][site1]['uwsgi_options']   = {}
-  default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
-  default['nginx']['sites'][site1]['server_name']  = site1
-  default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
-  default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
-  default['nginx']['sites'][site1]['errorlog']     = "#{node['nginx']['log_dir']}/#{site1}-error.log"
-  default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
-  default['nginx']['sites'][site1]['loglevel']     = 'warn'
-  default['nginx']['sites'][site1]['app']          = 'demo:app'
-  default['nginx']['sites'][site1]['revision'] = "v#{version1}"
-  default['nginx']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
-  default['nginx']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
-end

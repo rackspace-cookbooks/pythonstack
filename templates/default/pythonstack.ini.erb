@@ -7,7 +7,7 @@
 <%-   node[node['pythonstack']['webserver']]['sites'].each do |site_name| -%>
 <%-     site_name = site_name[0] -%>
 [MySQL-<%= site_name -%>]
-master-host = <%= @mysql_master_host %>
+master-host = <%= node['mysql-multi']['master'] %>
 slave-hosts = <%= node['mysql-multi']['slaves'].join(', ') %>
 port = <%= node['mysql']['port'] %>
 db_name = <%= site_name %>

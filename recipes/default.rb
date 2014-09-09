@@ -17,3 +17,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+if node['pythonstack']['webserver'] == 'apache' && node['pythonstack']['demo']['enabled']
+  site1 = 'example.com'
+  version1 = '0.0.6'
+
+  default['apache']['sites'][site1]['port']         = 80
+  default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
+  default['apache']['sites'][site1]['template']     = "apache2/sites/#{site1}.erb"
+  default['apache']['sites'][site1]['server_name']  = site1
+  default['apache']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
+  default['apache']['sites'][site1]['docroot']      = "#{node['apache']['docroot_dir']}/#{site1}"
+  default['apache']['sites'][site1]['allow_override'] = ['All']
+  default['apache']['sites'][site1]['errorlog']     = "#{node['apache']['log_dir']}/#{site1}-error.log"
+  default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_dir']}/#{site1}-access.log combined"
+  default['apache']['sites'][site1]['loglevel']     = 'warn'
+  default['apache']['sites'][site1]['script_name']  = 'wsgi.py'
+  default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'
+  default['apache']['sites'][site1]['revision'] = "v#{version1}"
+  default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
+  default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+end
+
+if node['pythonstack']['webserver'] == 'nginx' && node['pythonstack']['demo']['enabled']
+  site1 = 'example.com'
+  version1 = '0.0.6'
+
+  default['nginx']['sites'][site1]['port']         = 80
+  default['nginx']['sites'][site1]['uwsgi_port']   = 8080
+  default['nginx']['sites'][site1]['uwsgi_stats_port']   = '1717'
+  default['nginx']['sites'][site1]['uwsgi_options']   = {}
+  default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
+  default['nginx']['sites'][site1]['server_name']  = site1
+  default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
+  default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
+  default['nginx']['sites'][site1]['errorlog']     = "#{node['nginx']['log_dir']}/#{site1}-error.log"
+  default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
+  default['nginx']['sites'][site1]['loglevel']     = 'warn'
+  default['nginx']['sites'][site1]['app']          = 'demo:app'
+  default['nginx']['sites'][site1]['revision'] = "v#{version1}"
+  default['nginx']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
+  default['nginx']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
+end

@@ -3,7 +3,7 @@
 # Cookbook Name:: pythonstack
 # Recipe:: newrelic
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace Hosting
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 # The node['newrelic']['license'] attribute needs to be set for NewRelic to work
 if node['newrelic']['license']
   node.set['pythonstack']['newrelic']['application_monitoring'] = 'true'
@@ -36,16 +37,8 @@ if node['newrelic']['license']
   end
 
   if node['recipes'].include?('rabbitmq')
-    # needs to be run before hand to set attributes
+    # needs to be run before hand to set attributes (port specifically)
     include_recipe 'pythonstack::rabbitmq'
-
-    ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
-    node.set_unless['pythonstack']['rabbitmq']['monitor_password'] = secure_password
-    rabbitmq_user 'monitor' do
-      action %w(add set_permissions change_password)
-      permissions '.* .* .*'
-      password node['pythonstack']['rabbitmq']['monitor_password']
-    end
 
     meetme_config['rabbitmq'] = {
       name: node['hostname'],

@@ -18,7 +18,7 @@ describe port(80) do
   it { should be_listening }
 end
 
-# php
+# pythonstack.ini
 describe file('/etc/pythonstack.ini') do
   it { should be_file }
 end

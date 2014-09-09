@@ -3,7 +3,7 @@
 # Cookbook Name:: pythonstack
 # Recipe:: memcached
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace Hosting
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 # limitations under the License.
 #
 
-# Include the necessary recipes.
 if platform_family?('debian')
   include_recipe 'apt'
 end
