@@ -21,12 +21,15 @@ end
 
 group :kitchen_common do
   gem 'test-kitchen'
-  gem 'kitchen-rackspace'
-  gem 'curb'
 end
 
 group :kitchen_vagrant do
   gem 'kitchen-vagrant'
+  gem 'vagrant-wrapper'
+end
+
+group :kitchen_rackspace do
+  gem 'kitchen-rackspace'
 end
 
 group :development do
