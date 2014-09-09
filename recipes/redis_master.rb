@@ -1,9 +1,9 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
-# Recipe:: default
+# Recipe:: redis_master
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,4 @@
 #
 
 include_recipe 'redis-multi::master'
-include_recipe 'redis-multi'
-include_recipe 'redis-multi::enable'
-
-# allow traffic to postgresql port for local addresses only
-add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{node['redis-multi']['bind_port']} -j ACCEPT", 9999, 'Open port for redis')
+include_recipe 'pythonstack::redis_base'

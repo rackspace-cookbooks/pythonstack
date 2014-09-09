@@ -1,9 +1,9 @@
 # Encoding: utf-8
 #
-# Cookbook Name:: pythonstack
-# Recipe:: default
+# Cookbook Name:: phstack
+# Recipe:: redis_base
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,24 @@
 # limitations under the License.
 #
 
-include_recipe 'redis-multi'
-include_recipe 'redis-multi::single'
-include_recipe 'redis-multi::enable'
+stackname = 'pythonstack'
 
-# allow traffic to postgresql port for local addresses only
-add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{node['redis-multi']['bind_port']} -j ACCEPT", 9999, 'Open port for redis')
+include_recipe 'redis-multi'
+include_recipe 'redis-multi::enable'
+include_recipe 'platformstack::iptables'
+
+# allow app nodes to connect
+search_add_iptables_rules("tags:#{stackname.gsub('stack', '')}_app_node AND chef_environment:#{node.chef_environment}",
+                          'INPUT',
+                          "-m tcp -p tcp --dport #{node['redis-multi']['bind_port']} -j ACCEPT",
+                          9999,
+                          'Open port for redis from app')
+
+# allow redis to connect to eachother
+search_add_iptables_rules("tags:#{stackname}-redis AND chef_environment:#{node.chef_environment}",
+                          'INPUT',
+                          "-m tcp -p tcp --dport #{node['redis-multi']['bind_port']} -j ACCEPT",
+                          9999,
+                          'Open port for redis to redis')
+
+tag("#{stackname}-redis")

@@ -17,6 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+# set up demo if needed
+include_recipe 'pythonstack::default'
+
 include_recipe 'build-essential'
 include_recipe "pythonstack::#{node['pythonstack']['webserver']}"
 include_recipe 'git'
@@ -43,6 +47,8 @@ python_pip 'MySQL-python' do
   options '--allow-external' unless platform_family?('rhel')
 end
 python_pip 'pymongo'
+
+include_recipe 'chef-sugar'
 
 # if gluster is in our environment, install the utils and mount it to /var/www
 gluster_cluster = node['rackspace_gluster']['config']['server']['glusters'].values[0]
@@ -108,11 +114,6 @@ template 'pythonstack.ini' do
                mysql_node.deep_fetch(node['pythonstack']['webserver'], 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
              end
            end,
-    mysql_master_host: if mysql_node.respond_to?('deep_fetch')
-                         best_ip_for(mysql_node)
-                       else
-                         nil
-                       end,
     rabbit_host: if rabbit_node.respond_to?('deep_fetch')
                    best_ip_for(rabbit_node)
                  else
