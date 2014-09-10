@@ -3,7 +3,7 @@
 # Cookbook Name:: pythonstack
 # Recipe:: default
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace Hosting
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ if node['pythonstack']['webserver'] == 'apache' && node['pythonstack']['demo']['
   node.default['apache']['sites'][site1]['server_name']  = site1
   node.default['apache']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
   node.default['apache']['sites'][site1]['docroot']      = "#{node['apache']['docroot_dir']}/#{site1}"
-  node.default['apache']['sites'][site1]['allow_override'] = ['All']
   node.default['apache']['sites'][site1]['errorlog']     = "#{node['apache']['log_dir']}/#{site1}-error.log"
   node.default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_dir']}/#{site1}-access.log combined"
+  node.default['apache']['sites'][site1]['allow_override'] = ['All']
   node.default['apache']['sites'][site1]['loglevel']     = 'warn'
   node.default['apache']['sites'][site1]['script_name']  = 'wsgi.py'
   node.default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'

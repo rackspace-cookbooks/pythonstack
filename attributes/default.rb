@@ -19,4 +19,5 @@
 #
 
 node.set['pythonstack']['newrelic']['application_monitoring'] = ''
-node.default['pythonstack']['webserver'] = 'apache'
+default['pythonstack']['webserver'] = 'apache'
+default['pythonstack']['ini']['cookbook'] = 'pythonstack'

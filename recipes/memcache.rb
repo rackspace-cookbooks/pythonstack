@@ -1,8 +1,9 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
+# Recipe:: memcached
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace Hosting
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,4 +18,10 @@
 # limitations under the License.
 #
 
-default['pythonstack']['ini']['cookbook'] = 'pythonstack'
+if platform_family?('debian')
+  include_recipe 'apt'
+end
+include_recipe 'memcached'
+
+# enable agent for cloud monitoring
+node.set['platformstack']['cloud_monitoring']['plugins']['memcached']['disabled'] = false
