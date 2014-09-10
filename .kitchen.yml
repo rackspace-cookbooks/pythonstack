@@ -1,25 +1,19 @@
 ---
 driver:
   name: vagrant
+driver_config:
+  require_chef_omnibus: true
+
 provisioner:
   name: chef_zero
   attributes:
     pythonstack:
       demo:
         enabled: true
-    platformstack:
-      cloud_backup:
-        enabled: false
-      cloud_monitoring:
-        enabled: false
     authorization:
       sudo:
         users: ['vagrant']
         passwordless: true
-    rackspace:
-      cloud_credentials:
-        username: 'racker'
-        api_key: 'secret'
     mysql:
       server_root_password: "randompass"
       server_repl_password: "randompass"
