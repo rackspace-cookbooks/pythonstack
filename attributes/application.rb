@@ -17,4 +17,3 @@
 # limitations under the License.
 #
 
-default['pythonstack']['ini']['cookbook'] = 'pythonstack'
