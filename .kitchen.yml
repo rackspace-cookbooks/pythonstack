@@ -1,25 +1,25 @@
 ---
 driver:
   name: vagrant
+driver_config:
+  require_chef_omnibus: true
+
 provisioner:
   name: chef_zero
   attributes:
     pythonstack:
       demo:
         enabled: true
-    platformstack:
-      cloud_backup:
-        enabled: false
-      cloud_monitoring:
-        enabled: false
     authorization:
       sudo:
         users: ['vagrant']
         passwordless: true
-    rackspace:
-      cloud_credentials:
-        username: 'racker'
-        api_key: 'secret'
+    mysql:
+      server_root_password: "randompass"
+      server_repl_password: "randompass"
+      server_debian_password: "randompass"
+    holland:
+      password: "randompass"
 
 platforms:
   - name: ubuntu-12.04
@@ -33,7 +33,18 @@ platforms:
     - recipe[yum]
 
 suites:
-  - name: default
+  - name: aio-apache
+    run_list:
+      - recipe[pythonstack::mysql_base]
+      - recipe[pythonstack::postgresql_base]
+      - recipe[pythonstack::mongodb_standalone]
+      - recipe[pythonstack::memcached]
+      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::rabbitmq]
+      - recipe[pythonstack::redis_single]
+      - recipe[pythonstack::application_python]
+
+  - name: aio-nginx
     run_list:
       - recipe[pythonstack::mysql_base]
       - recipe[pythonstack::postgresql_base]
@@ -44,45 +55,24 @@ suites:
       - recipe[pythonstack::redis_single]
       - recipe[pythonstack::application_python]
     attributes:
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
-      holland:
-        password: "randompass"
+      pythonstack:
+        webserver: "nginx"
 
   - name: application_python_apache
     run_list:
       - recipe[pythonstack::application_python]
 
-  - name: mysql
-    run_list:
-      - recipe[pythonstack::mysql_base]
-    attributes:
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
-      holland:
-        password: "randompass"
-
-  - name: postgresql
-    run_list:
-      - recipe[pythonstack::postgresql_base]
-
   - name: application_python_nginx
     run_list:
-      - recipe[pythonstack::mysql_base]
-      - recipe[pythonstack::memcached]
-      - recipe[pythonstack::varnish]
-      - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::application_python]
     attributes:
       pythonstack:
         webserver: "nginx"
-      mysql:
-        server_root_password: "randompass"
-        server_repl_password: "randompass"
-        server_debian_password: "randompass"
-      holland:
-        password: "randompass"
+
+  - name: mysql
+    run_list:
+      - recipe[pythonstack::mysql_base]
+
+  - name: postgresql
+    run_list:
+      - recipe[pythonstack::postgresql_base]
