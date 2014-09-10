@@ -3,7 +3,7 @@
 # Cookbook Name:: pythonstack
 # Recipe:: application_python
 #
-# Copyright 2014, Rackspace UK, Ltd.
+# Copyright 2014, Rackspace Hosting
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
 # limitations under the License.
 #
 
+stackname = 'pythonstack'
+
 # set up demo if needed
-include_recipe 'pythonstack::default'
+include_recipe "#{stackname}::default"
 
 include_recipe 'build-essential'
-include_recipe "pythonstack::#{node['pythonstack']['webserver']}"
+include_recipe "#{stackname}::#{node[stackname]['webserver']}"
 include_recipe 'git'
 include_recipe 'python::package'
 include_recipe 'python::pip'
@@ -60,7 +62,7 @@ if gluster_cluster.key?('nodes')
       gluster_ips.push(server[1]['ip'])
     end
   end
-  node.set_unless['pythonstack']['gluster_connect_ip'] = gluster_ips.sample
+  node.set_unless[stackname]['gluster_connect_ip'] = gluster_ips.sample
 
   # install gluster mount
   package 'glusterfs-client' do
@@ -70,22 +72,22 @@ if gluster_cluster.key?('nodes')
   # set up the mountpoint
   mount 'webapp-mountpoint' do
     fstype 'glusterfs'
-    device "#{node['pythonstack']['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
+    device "#{node[stackname]['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
     mount_point node['apache']['docroot_dir']
     action %w(mount enable)
   end
 end
 
-node[node['pythonstack']['webserver']]['sites'].each do | site_name, site_opts |
+node[node[stackname]['webserver']]['sites'].each do | site_name, site_opts |
   application site_name do
     path site_opts['docroot']
-    owner node[node['pythonstack']['webserver']]['user']
-    group node[node['pythonstack']['webserver']]['group']
+    owner node[node[stackname]['webserver']]['user']
+    group node[node[stackname]['webserver']]['group']
     deploy_key site_opts['deploy_key']
     repository site_opts['repository']
     revision site_opts['revision']
     restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
-    then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node['pythonstack']['webserver'] == 'nginx'
+    then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node[stackname]['webserver'] == 'nginx'
   end
 end
 
@@ -94,40 +96,41 @@ if Chef::Config[:solo]
   mysql_node = nil
   rabbit_node = nil
 else
-  mysql_node = search('node', "recipes:pythonstack\\:\\:mysql_master AND chef_environment:#{node.chef_environment}").first
-  rabbit_node = search('node', "recipes:pythonstack\\:\\:rabbitmq AND chef_environment:#{node.chef_environment}").first
+  mysql_node = search('node', "recipes:#{stackname}\\:\\:mysql_master AND chef_environment:#{node.chef_environment}").first
+  rabbit_node = search('node', "recipes:#{stackname}\\:\\:rabbitmq AND chef_environment:#{node.chef_environment}").first
 end
-template 'pythonstack.ini' do
-  path '/etc/pythonstack.ini'
-  cookbook node['pythonstack']['ini']['cookbook']
-  source 'pythonstack.ini.erb'
+template "#{stackname}.ini" do
+  path "/etc/#{stackname}.ini"
+  cookbook node[stackname]['ini']['cookbook']
+  source "#{stackname}.ini.erb"
   owner 'root'
-  group node[node['pythonstack']['webserver']]['group']
+  group node[node[stackname]['webserver']]['group']
   mode '00640'
   variables(
     cookbook_name: cookbook_name,
     # if it responds then we will create the config section in the ini file
     mysql: if mysql_node.respond_to?('deep_fetch')
-             if mysql_node.deep_fetch(node['pythonstack']['webserver'], 'sites').nil?
+             if mysql_node.deep_fetch(node[stackname]['webserver'], 'sites').nil?
                nil
              else
-               mysql_node.deep_fetch(node['pythonstack']['webserver'], 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
+               mysql_node.deep_fetch(node[stackname]['webserver'], 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
              end
            end,
+    # need to do here because sugar is not available inside the template
     rabbit_host: if rabbit_node.respond_to?('deep_fetch')
                    best_ip_for(rabbit_node)
                  else
                    nil
                  end,
     rabbit_passwords: if rabbit_node.respond_to?('deep_fetch')
-                        rabbit_node.deep_fetch('pythonstack', 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node['pythonstack']['rabbitmq']['passwords']
+                        rabbit_node.deep_fetch(stackname, 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node[stackname]['rabbitmq']['passwords']
                       else
                         nil
                       end
   )
   action 'create'
   # For Nginx the service Uwsgi subscribes to the template, as we need to restart each Uwsgi service
-  notifies 'restart', 'service[apache2]', 'delayed' unless node['pythonstack']['webserver'] == 'nginx'
+  notifies 'restart', 'service[apache2]', 'delayed' unless node[stackname]['webserver'] == 'nginx'
 end
 
 # backups
@@ -137,8 +140,8 @@ node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email
 node.default['rackspace_cloudbackup']['backups'] =
   [
     {
-      location: node[node['pythonstack']['webserver']]['docroot_dir'],
-      enable: node['pythonstack']['rackspace_cloudbackup']['http_docroot']['enable'],
+      location: node[node[stackname]['webserver']]['docroot_dir'],
+      enable: node[stackname]['rackspace_cloudbackup']['http_docroot']['enable'],
       comment: 'Web Content Backup',
       cloud: { notify_email: node['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] }
     }

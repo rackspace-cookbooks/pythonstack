@@ -18,9 +18,11 @@
 # limitations under the License.
 #
 
+stackname = 'pythonstack'
+
 # The node['newrelic']['license'] attribute needs to be set for NewRelic to work
 if node['newrelic']['license']
-  node.set['pythonstack']['newrelic']['application_monitoring'] = 'true'
+  node.set[stackname]['newrelic']['application_monitoring'] = 'true'
   node.override['newrelic']['application_monitoring']['daemon']['ssl'] = true
   node.override['newrelic']['server_monitoring']['ssl'] = true
   include_recipe 'platformstack::default'
@@ -38,21 +40,21 @@ if node['newrelic']['license']
 
   if node['recipes'].include?('rabbitmq')
     # needs to be run before hand to set attributes (port specifically)
-    include_recipe 'pythonstack::rabbitmq'
+    include_recipe "#{stackname}::rabbitmq"
 
     meetme_config['rabbitmq'] = {
       name: node['hostname'],
       host: 'localhost',
       port: node['rabbitmq']['port'],
       username: 'monitor',
-      password: node['pythonstack']['rabbitmq']['monitor_password'],
+      password: node[stackname]['rabbitmq']['monitor_password'],
       api_path: '/api'
     }
   end
 
   if node['recipes'].include?('nginx')
     template 'nginx-monitor' do
-      cookbook 'pythonstack'
+      cookbook stackname
       source 'nginx/sites/monitor.erb'
       path "#{node['nginx']['dir']}/sites-available/monitor.conf"
       owner 'root'
