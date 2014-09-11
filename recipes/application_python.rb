@@ -87,7 +87,7 @@ if gluster_cluster.key?('nodes')
   end
 end
 
-unless node.deep_fetch(stackname, 'code-deployment').nil?
+if node.deep_fetch(stackname, 'code-deployment', 'enabled')
   node[node[stackname]['webserver']]['sites'].each do | site_name, site_opts |
     application site_name do
       path site_opts['docroot']
