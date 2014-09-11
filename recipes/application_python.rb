@@ -33,6 +33,15 @@ python_pip 'setuptools' do
   version node['python']['setuptools_version']
 end
 
+case node[stackname]['webserver']
+when 'apache'
+  node.default[stackname]['gluster_mountpoint'] = node['apache']['docroot_dir']
+when 'nginx'
+  node.default[stackname]['gluster_mountpoint'] = node['nginx']['default_root']
+else
+  node.default[stackname]['gluster_mountpoint'] = '/var/www'
+end
+
 include_recipe 'python'
 include_recipe 'mysql::client'
 
@@ -73,7 +82,7 @@ if gluster_cluster.key?('nodes')
   mount 'webapp-mountpoint' do
     fstype 'glusterfs'
     device "#{node[stackname]['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
-    mount_point node['apache']['docroot_dir']
+    mount_point node[stackname]['gluster_mountpoint']
     action %w(mount enable)
   end
 end
@@ -130,7 +139,7 @@ template "#{stackname}.ini" do
   )
   action 'create'
   # For Nginx the service Uwsgi subscribes to the template, as we need to restart each Uwsgi service
-  notifies 'restart', 'service[apache2]', 'delayed' unless node[stackname]['webserver'] == 'nginx'
+  notifies 'restart', 'service[apache2]', 'delayed' if node[stackname]['webserver'] == 'apache'
 end
 
 # backups
