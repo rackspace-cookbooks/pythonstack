@@ -87,16 +87,18 @@ if gluster_cluster.key?('nodes')
   end
 end
 
-node[node[stackname]['webserver']]['sites'].each do | site_name, site_opts |
-  application site_name do
-    path site_opts['docroot']
-    owner node[node[stackname]['webserver']]['user']
-    group node[node[stackname]['webserver']]['group']
-    deploy_key site_opts['deploy_key']
-    repository site_opts['repository']
-    revision site_opts['revision']
-    restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
-    then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node[stackname]['webserver'] == 'nginx'
+unless node.deep_fetch(stackname, 'code-deployment').nil?
+  node[node[stackname]['webserver']]['sites'].each do | site_name, site_opts |
+    application site_name do
+      path site_opts['docroot']
+      owner node[node[stackname]['webserver']]['user']
+      group node[node[stackname]['webserver']]['group']
+      deploy_key site_opts['deploy_key']
+      repository site_opts['repository']
+      revision site_opts['revision']
+      restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
+      then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node[stackname]['webserver'] == 'nginx'
+    end
   end
 end
 
