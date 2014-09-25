@@ -10,60 +10,124 @@ Requirements
 ------------
 #### Cookbooks
 
-* `git`
-* `rackops_rolebook`
+* `newrelic_meetme_plugin`
+* `application_python`
+* `rackspace_gluster`
+* `build-essential`
+* `platformstack`
+* `application`
+* `redis-multi`
+* `mysql-multi`
+* `chef-sugar`
+* `memcached`
+* `database`
+* `newrelic`
+* `pg-multi`
+* `rabbitmq`
+* `mongodb`
+* `openssl`
+* `yum-epel`
+* `yum-ius`
+* `apache2`
+* `varnish`
+* `python`
+* `mysql`
+* `nginx`
+* `uwsgi`
 * `yum`
 * `apt`
-* `chef-sugar`
-* `platformstack::monitors`
-* `platformstack::iptables`
-* `apache2`
-* `apache2::mod_wscgi`
-* `database::mysql`
-* `mysql`
-* `mysql-multi`
-* `postgresql`
-* `pg-multi`
+* `git`  
+
+
+
+
 
 Recipes
 ----------
 #### default
+Sets up webserver attributes depending on attribute ```['pythonstack']['webserver'] ``` value  
+
 #### apache
-Includes recipes: platformstack::monitors platformstack::iptables apt apache2::default apache2::mod_wscgi apache2::mod_python
 Creates sites coming from node['apache']['sites'] array
-Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled
+Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled  
+
 #### nginx
-Includes recipes: platformstack::monitors platformstack::iptables apt/yum-epel nginx::default uwsgi python::package python::pip
 Creates sites coming from node['nginx']['sites'] array
-Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled
+Creates monitoring check for each site if node[platformstack][cloud_monitoring] = enabled  
+
 #### application_python_nginx
-Includes recipes: git, build-essential, pythonstack::(webserver), mysql::client
-Creates application_deployment configuration, checking out the code from node['nginx']['sites']['repository'] and putting into the path specified in node['nginx']['sites']['docroot']
-Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini
+Creates a configuration file for applications using variables for mysql_master node and rabbitmq node and placing this file in /etc/pythonstack.ini 
+
+#### format_disk  
+Recipe will format /dev/xvde1 (datadisk on Rackspace performance cloud nodes) and will prepare it for the mysql datadir  
+
+#### gluster 
+Sets up gluster nodes and replica count  
+
+#### memcache
+Install memcached and sets up cloud monitoring of memcached  
+
+#### mongodb_standalone
+Sets up a stand alone mongo db instance  
+
+#### mysql_add_drive 
+Recipe will format /dev/xvde1 (datadisk on Rackspace performance cloud nodes) and will prepare it for the mysql datadir  
+
 #### mysql_base
 Includes recipe database::mysql, platformstack::monitors, mysql-multi::mysql_base
 Creates mysql-monitor template if node[platformstack][cloud_monitoring] = enabled
 Creates an iptables rule for application_python nodes in order to connect to this one.
+
 #### mysql_master
 Runs pythonstack::mysql_base along with mysql-multi::mysql_master recipes
 creates db and associated user per vhost
 use this if you are running on a single node
+
 #### mysql_slave
 Runs pythonstack::mysql_base along with mysql-multi::mysql_slave recipes
+
 #### mysql_holland
 Setup an apt or yum repository for holland
 Installs needed packages (holland and holland-mysqldump)
 Verifies if this server is a slave or standalone
 Setup a cronjob based on holland attributes
+
 #### postgresql_base
 Runs pg-multi::default recipe
 Sets up default IP talbles rule to allow acces on ['postgresql']['port']
+
 #### postgresql_master
 Runs pythonstack::postgresql_base along with pg-multi::pg_master recipes
+
 #### postgresql_slave
 Runs pythonstack::postgresql_base along with pg-multi::pg_slave recipes
+
 #### redis_base
-Sets up a standalone redis node. It uses rackspace-support/redis-multi cookbook and includes redis-multi, redis-multi::single and redis-multi::enable and opens port in iptables.
+Sets up a standalone redis node. It uses rackspace-support/redis-multi cookbook and includes redis-multi, redis-multi::single and redis-multi::enable and opens port in iptables.  
+
+#### redis_master
+Uses community cookbook redis-multi::master and Rackspace pythonstack::redis_base
+
+#### redis_sentinel
+Install sentinel using community cookbooks
+
+#### redis_single
+Uses Rackspace pythonstack::redis_base and community cookbook redis-multi::single
+
+#### redis_slave
+Uses Rackspace pythonstack::redis_base and community cookbook redis-multi::slave
+
+#### newrelic
+Install Newrelic if ```node['newrelic']['license'] ``` set with license key  
+
+#### rabbitmq
+Installs Rabbitmq
+
+#### varnish
+Installs and sets up Varnish. loud monitoring enabled by default
+
+
+#### 
 
 
 Data_Bag
@@ -75,133 +139,598 @@ No Data_Bag configured for this cookbook
 Attributes
 ----------
 
-#### default.rb
-* node.default['pythonstack']['webserver'] = apache
-  * Indicate which webserver to use, currently Nginx/Apache
 
-#### apache.rb
-* site1 = 'example.com'
-  * Indicate the fqdn of the site number 1
-* node.default['apache']['sites'][site1]['port']         = 80
-  * Indicates what port should be this site listening on
-* node.default['apache']['sites'][site1]['cookbook']     = 'pythonstack'
-  * Indicates the name of the cookbook to get templates from
-* node.default['apache']['sites'][site1]['template']     = "apache2/sites/#{site1}.erb"
-  * Indicates template file location for this site
-* node.default['apache']['sites'][site1]['server_name']  = site1
-  * Indicates server_name variable to be used in template file
-* node.default['apache']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
-  * Indicates server_alias variable to be used in template file
-* node.default['apache']['sites'][site1]['docroot']      = "/var/www/#{site1}"
-  * Indicates docroot variable to be used in template file
-* node.default['apache']['sites'][site1]['allow_override'] = ['All']
-  * Indicates allow_override variable to be used in template file
-* node.default['apache']['sites'][site1]['errorlog']     = "#{node['apache']['log_dir']}/#{site1}-error.log"
-  * Indicates errorlog variable to be used in template file
-* node.default['apache']['sites'][site1]['customlog']    = "#{node['apache']['log_dir']}/#{site1}-access.log combined"
-  * Indicates customlog variable to be used in template file
-* node.default['apache']['sites'][site1]['loglevel']     = 'warn'
-  * Indicates loglevel variable to be used in template file
-* node.default['apache']['sites'][site1]['server_admin'] = 'demo@demo.com'
-  * Indicates server_admin variable to be used in template file
-* node.default['apache']['sites'][site1]['revision'] = "v#{version1}"
-  * Indicates revision variable to be used to deploy this site files
-* node.default['apache']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
-  * Indicates repository variable to be used to deploy this site
-* node.default['apache']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
-  * Indicates deploy_key variable to be used when getting data from repository
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td><tt>['holland']['enabled']</tt></td>
+    <td>boolean</td>
+    <td>Sets mode (true | false)</td>
+    <td><tt>false</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['holland']['password']</tt></td>
+    <td>string</td>
+    <td>Define password</td>
+    <td><tt>'notagudpassword'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['holland']['cron']['day']</tt></td>
+    <td>string</td>
+    <td>Set cron job day</td>
+    <td><tt>'*'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['holand']['cron']['hour']</tt></td>
+    <td>string</td>
+    <td>Set cron job hour</td>
+    <td><tt>'3'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['holland']['cron']['minute']</tt></td>
+    <td>string</td>
+    <td>Set cron job minute </td>
+    <td><tt>'12'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['pythonstack']['rackspace_cloudbackup']['http_docroot']['enable']</tt></td>
+    <td>boolena</td>
+    <td>Enable cloudbackup (true | false)</td>
+    <td><tt>false</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['pythonstack']['newrelic']['application_monitoring']</tt></td>
+    <td>string</td>
+    <td>Set application name</td>
+    <td><tt>''</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['pythonstack']['webserver']</tt></td>
+    <td>string</td>
+    <td>webserver to use (Nginx/Apache)</td>
+    <td><tt>'apache'</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['pythonstack']['ini']['cookbook']</tt></td>
+    <td>string</td>
+    <td>Cookbook name</td>
+    <td><tt>'pythonstack'</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['pythonstack']['code-deployment']['enabled']</tt></td>
+    <td>boolena</td>
+    <td>Enable code deployment (true | false)</td>
+    <td><tt>true</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['pythonstack']['demo']['enabled']</tt></td>
+    <td>boolean</td>
+    <td>Is this a demo deployment?</td>
+    <td><tt>false</tt></td>
+  </tr>
+  <td><tt>['pythonstack']['rabbitmq']['passwords']</tt></td>
+    <td>array</td>
+    <td>Define passwords</td>
+    <td><tt>{}</tt></td>
+  </tr>
+    <td><tt>['pythonstack']['varnish']['multi']</tt></td>
+    <td>boolean</td>
+    <td>Is varnish mulit node</td>
+    <td><tt>true</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['disk']['name']</tt></td>
+    <td>string</td>
+    <td>Define disk name</td>
+    <td><tt>'/dev/xvde1'</tt></td>
+  </tr>
+    <tr>
+    <td><tt>['disk']['fs']</tt></td>
+    <td>string</td>
+    <td>Disk file system</td>
+    <td><tt>'ext4'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['rackspace_gluster']['config']['server']['glusters']['Gluster Cluster 1']</tt></td>
+    <td>Array</td>
+    <td></td>
+    <td><tt>{}</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['rackspace_gluster']['config']['server']['glusters']['Gluster Cluster 1']['volume']</tt></td>
+    <td>string</td>
+    <td>Define Volume</td>
+    <td><tt>'vol10'</tt></td>
+  </tr>
+  <td><tt>['nginx']['default_site_enabled']</tt></td>
+    <td>boolean</td>
+    <td>Is default site enabled?</td>
+    <td><tt>false</tt></td>
+  </tr>
+  <td><tt>['nginx']['init_style']'</tt></td>
+    <td>string</td>
+    <td>If platform ubuntu </td>
+    <td><tt>'upstart'</tt></td>
+  </tr>
+  <td><tt>['nginx']['listen_ports']</tt></td>
+    <td>string</td>
+    <td>Set listening ports</td>
+    <td><tt>'%w(80)'</tt></td>
+  </tr>
+  <td><tt>['nginx']['default_root']</tt></td>
+    <td>string</td>
+    <td>Default root path</td>
+    <td><tt>'/var/www'</tt></td>
+  </tr>
+  <tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['remote_http']['disabled']</tt></td>
+  <td>boolean</td>
+  <td>Enable or Disable monitoring</td>
+  <td><tt>false</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['remote_http']['alarm']</tt></td>
+  <td>boolean</td>
+  <td>Enable or disable monitor alarms </td>
+  <td><tt>false</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['remote_http']['period']</tt></td>
+  <td>int</td>
+  <td>Interval in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['remote_http']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>15</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['disabled']</tt></td>
+  <td>boolean</td>
+  <td>Enable or Disable monitoring</td>
+  <td><tt>false</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['alarm']</tt></td>
+  <td>boolean</td>
+  <td>Enable or Disable monitor alarms</td>
+  <td><tt>false</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['period']</tt></td>
+  <td>int</td>
+  <td>Interval in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['user']</tt></td>
+  <td>string</td>
+  <td>Momyswl monitoring user</td>
+  <td><tt>'raxmon-agent'</tt></td>
+</tr>
+<tr>
+  <td><tt>['pythonstack']['cloud_monitoring']['agent_mysql']['password']</tt></td>
+  <td>string</td>
+  <td>Mysql monitor agent password</td>
+  <td><tt>nil</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']</tt></td>
+  <td>hash</td>
+  <td>List of plugins to use</td>
+  <td><tt>{}</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>'rabbitmq'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['disabled']</tt></td>
+  <td>boolean</td>
+  <td>Enable ort disable plugin</td>
+  <td><tt>true</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['period']</tt></td>
+  <td>int</td>
+  <td>Interval in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>30</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['file_url']</tt></td>
+  <td>string</td>
+  <td>Plugin location</td>
+  <td><tt>'https://raw.githubusercontent.com/racker/rackspace-monitoring-agent-plugins-contrib/master/rabbitmq.py'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['cookbook']</tt></td>
+  <td>string</td>
+  <td><Plugin cookbook name/td>
+  <td><tt>'platformstack'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['details']['file']</tt></td>
+  <td>string</td>
+  <td>Plugin file name</td>
+  <td><tt>'rabbitmq.py'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['details']['args']</tt></td>
+  <td>array</td>
+  <td></td>
+  <td><tt>[]</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['details']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['alarm']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['alarm']['notification_plan_id']</tt></td>
+  <td>string</td>
+  <td>Notifaction plan name</td>
+  <td><tt>'npMANAGED'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['rabbitmq']['alarm']['criteria']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>'varnish'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['disabled']</tt></td>
+  <td>boolean</td>
+  <td>Enable or disable varnish plugin</td>
+  <td><tt>true</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['period']</tt></td>
+  <td>int</td>
+  <td>Interval in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>30</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['file_url']</tt></td>
+  <td>string</td>
+  <td>Plugin location</td>
+  <td><tt>'https://raw.githubusercontent.com/racker/rackspace-monitoring-agent-plugins-contrib/master/varnish.sh'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['cookbook']</tt></td>
+  <td>string</td>
+  <td>Plugin cookbook name</td>
+  <td><tt>'platformstack'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['details']['file']</tt></td>
+  <td>string</td>
+  <td>Plugin file name</td>
+  <td><tt>'varnish.sh'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['details']['args']</tt></td>
+  <td>array</td>
+  <td></td>
+  <td><tt>[]</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['details']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['alarm']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['alarm']['notification_plan_id']</tt></td>
+  <td>string</td>
+  <td>Notifaction plan name</td>
+  <td><tt>'npMANAGED'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['varnish']['alarm']['criteria']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>'memcached'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['disabled']</tt></td>
+  <td>boolean</td>
+  <td>Enables or disables plugin</td>
+  <td><tt>true</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['period']</tt></td>
+  <td>int</td>
+  <td>Interval in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>30</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['file_url']</tt></td>
+  <td>string</td>
+  <td>Plugin file location</td>
+  <td><tt>'https://raw.githubusercontent.com/racker/rackspace-monitoring-agent-plugins-contrib/master/memcached_stats.py'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['cookbook']</tt></td>
+  <td>string</td>
+  <td>Plugin cookbook name</td>
+  <td><tt>'platformstack'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['details']['file']</tt></td>
+  <td>string</td>
+  <td>Plugin file name</td>
+  <td><tt>'memcached_stats.py'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['details']['args']</tt></td>
+  <td>array</td>
+  <td></td>
+  <td><tt>[]</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['details']['timeout']</tt></td>
+  <td>int</td>
+  <td>Timeout in mins</td>
+  <td><tt>60</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['alarm']['label']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['alarm']['notification_plan_id']</tt></td>
+  <td>string</td>
+  <td>Notifcation plan name</td>
+  <td><tt>'npMANAGED'</tt></td>
+</tr>
+<tr>
+  <td><tt>['platformstack']['cloud_monitoring']['plugins']['memcached']['alarm']['criteria']</tt></td>
+  <td>string</td>
+  <td></td>
+  <td><tt>''</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['port']</tt></td>
+  <td>int</td>
+  <td>Define site port</td>
+  <td><tt>80</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['cookbook']</tt></td>
+  <td>string</td>
+  <td>Cookbook name</td>
+  <td><tt>'pythonstack'</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['template']</tt></td>
+  <td>string</td>
+  <td>Site templatet location</td>
+  <td><tt>"apache2/sites/#{site1.erb}"</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['server_name']</tt></td>
+  <td>variable</td>
+  <td>Sites server name</td>
+  <td><tt>site1</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['server_alias']</tt></td>
+  <td>array</td>
+  <td>Sites server name alias</td>
+  <td><tt>["test.#{site1}", "www.#{site1}"]</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['docroot']</tt></td>
+  <td>string</td>
+  <td>Sites document root name</td>
+  <td><tt>"#{node['apache']['docroot_dir']}/#{site1}"</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['errorlog']</tt></td>
+  <td>string</td>
+  <td>Sites error log location</td>
+  <td><tt>"#{node['apache']['log_dir']}/#{site1}-error.log"</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['customlog']</tt></td>
+  <td>string</td>
+  <td>Sites custom log location</td>
+  <td><tt>"#{node['apache']['log_dir']}/#{site1}-access.log combined"</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['allow_override']</tt></td>
+  <td>array</td>
+  <td></td>
+  <td><tt>['ALL']</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['loglevel']</tt></td>
+  <td>string</td>
+  <td>Sites logging level</td>
+  <td><tt>'warn'</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['script_name']</tt></td>
+  <td>string</td>
+  <td>Sites script name</td>
+  <td><tt>'wsgi.py'</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['server_admin']</tt></td>
+  <td>string</td>
+  <td>Sites admin mail address</td>
+  <td><tt>'demo@demo.com'</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['revision']</tt></td>
+  <td>string</td>
+  <td>Site version</td>
+  <td><tt>"v#{version1}"</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['repository']</tt></td>
+  <td>string</td>
+  <td>Sites app repo location</td>
+  <td><tt>'https://github.com/rackops/flask-test-app'</tt></td>
+</tr>
+<tr>
+  <td><tt>['apache']['sites'][site1]['deploy_key']</tt></td>
+  <td>string</td>
+  <td>Sites deploymnet key</td>
+  <td><tt>'/root/.ssh/id_rsa'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['port']</tt></td>
+  <td>int</td>
+  <td>Define sites port</td>
+  <td><tt>80</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['uswgi_port']</tt></td>
+  <td>int</td>
+  <td>Define sites uswgi port</td>
+  <td><tt>8080</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['uswgi_stats_port']</tt></td>
+  <td>string</td>
+  <td>Define sites uswgi stats port</td>
+  <td><tt>'1717'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['uswgi_options']</tt></td>
+  <td>hash</td>
+  <td>Define uswgi option</td>
+  <td><tt>{}</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['cookbook']</tt></td>
+  <td>string</td>
+  <td>Sites cookbook name</td>
+  <td><tt>'pythonstack'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['server_name']</tt></td>
+  <td>variable</td>
+  <td>Sites server name</td>
+  <td><tt>site1</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['server_alias']</tt></td>
+  <td>array</td>
+  <td>Sites server alias</td>
+  <td><tt>["test.#{site1}", "www.#{site1}"]</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['docroot']</tt></td>
+  <td>string</td>
+  <td>Sites document root</td>
+  <td><tt>"#{node['nginx']['default_root']}/#{site1}"</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['errorlog']</tt></td>
+  <td>string</td>
+  <td>Site error log location</td>
+  <td><tt>"#{node['nginx']['log_dir']}/#{site1}-error.log"</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['customlog']</tt></td>
+  <td>string</td>
+  <td>Sites custom log location c</td>
+  <td><tt>"#{node['nginx']['log_dir']}/#{site1}-access.log combined"</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['loglevel']</tt></td>
+  <td>string</td>
+  <td>Sites logging level</td>
+  <td><tt>'warn'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['app']</tt></td>
+  <td>string</td>
+  <td>Application name</td>
+  <td><tt>'demo:app'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['revision']</tt></td>
+  <td>string</td>
+  <td>Site version</td>
+  <td><tt>"v#{version1}"</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['repository']</tt></td>
+  <td>string</td>
+  <td>Sites app repo location</td>
+  <td><tt>'https://github.com/rackops/flask-test-app'</tt></td>
+</tr>
+<tr>
+  <td><tt>['nginx']['sites'][site1]['deploy_key']</tt></td>
+  <td>string</td>
+  <td>Site deployment key</td>
+  <td><tt>'/root/.ssh/id_rsa'</tt></td>
+</tr>
+</table>  
 
-#### nginx.rb
-* node.default['nginx']['default_site_enabled'] = false
-  * Disabled the default website
-* node.default['nginx']['listen_ports'] = %w(80)
-  * Give a list of ports Nginx listen on, it's in the default apache2 cookbook, but not in the Nginx one, which is why we have to add it manually
-* site1 = 'example.com'
-  * Indicate the fqdn of the site number 1
-* node.default['nginx']['sites'][site1]['port']         = 80
-  * Indicates what port should be this site listening on
-* node.default['nginx']['sites'][site1]['uwsgi_port']         = 8080
-  * Indicates what port should be the uwsgi service listening on
-* node.default['nginx']['sites'][site1]['uwsgi_stats_port']         = '1717'
-  * Indicates what port should be the uwsgi stats service listening on
-* node.default['nginx']['sites'][site1]['uwsgi_options']         = { 'myoption' => 'myvalue'}
-  * Add some other options to the Uwsgi ini configuration file
-* node.default['nginx']['sites'][site1]['cookbook']     = 'pythonstack'
-  * Indicates the name of the cookbook to get templates from
-* node.default['nginx']['sites'][site1]['server_name']  = site1
-  * Indicates server_name variable to be used in template file
-* node.default['nginx']['sites'][site1]['server_alias'] = ["test.#{site1}", "www.#{site1}"]
-  * Indicates server_alias variable to be used in template file
-* node.default['nginx']['sites'][site1]['docroot']      = "#{node['nginx']['default_root']}/#{site1}"
-  * Indicates docroot variable to be used in template file
-* node.default['nginx']['sites'][site1]['errorlog']     = "#{node['nginx']['log_dir']}/#{site1}-error.log"
-  * Indicates errorlog variable to be used in template file
-* node.default['nginx']['sites'][site1]['customlog']    = "#{node['nginx']['log_dir']}/#{site1}-access.log combined"
-  * Indicates customlog variable to be used in template file
-* node.default['nginx']['sites'][site1]['loglevel']     = 'warn'
-  * Indicates loglevel variable to be used in template file
-* node.default['nginx']['sites'][site1]['app']     = 'demo:app'
-  * Indicates Python app namespace
-* node.default['nginx']['sites'][site1]['revision'] = "v#{version1}"
-  * Indicates revision variable to be used to deploy this site files
-* node.default['nginx']['sites'][site1]['repository'] = 'https://github.com/rackops/flask-test-app'
-  * Indicates repository variable to be used to deploy this site
-* node.default['nginx']['sites'][site1]['deploy_key'] = '/root/.ssh/id_rsa'
-  * Indicates deploy_key variable to be used when getting data from repository
-
-#### holland.rb
-
-* default['holland']['enabled'] = false
-  * Defines if holland is enabled or not in this node
-* default['holland']['password'] = 'notagudpassword'
-  * Defines the password for holland user in mysql database
-* default['holland']['cron']['day'] = '*'
-  * Defines day for backup
-* default['holland']['cron']['hour'] = '3'
-  * Defines hour for backup
-* default['holland']['cron']['minute'] = '12'
-  * Defines minute for backup
-
-#### monitoring.rb
-
-* default['pythonstack']['cloud_monitoring']['remote_http']['disabled'] = false
-* default['pythonstack']['cloud_monitoring']['remote_http']['alarm'] = false
-* default['pythonstack']['cloud_monitoring']['remote_http']['period'] = 60
-* default['pythonstack']['cloud_monitoring']['remote_http']['timeout'] = 15
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['disabled'] = false
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['alarm'] = false
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['period'] = 60
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['timeout'] = 15
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['user'] = 'raxmon-agent'
-* default['pythonstack']['cloud_monitoring']['agent_mysql']['password'] = nil
-
-#### mysql.rb
-
-* default['mysql-multi']['master'] = ''
-  * Define IP address of master MySQL node
-* default['mysql-multi']['slaves'] = []
-  * Define array of IP addresses for slave node(s)
-* default['mysql-multi']['slave_user'] = 'replicant'
-  * Used to customize replication user name
-* ['mysql-multi']['server_repl_password'] = ['mysql']['server_repl_password']
-  * Used to change replication user password
-
-#### postgresql.rb
-
-* default['postgresql']['password']['postgres'] = 'randompasswordforpostgresql'
-  * Indicates admin password for postgresql
-* default['pg-multi']['replication']['user'] = 'repl'
-  * Used to customize replication username.
-* default['pg-multi']['replication']['password'] = 'useagudpasswd'
-  * Used to set replication user password
-* default['pg-multi']['master_ip'] = ''
-  * Define Ip address of master node
-* default['pg-multi']['slave_ip'] = []
-  * Define array of IP addresses for slave node(s)
-* default['postgresql']['enable_pdgd_yum'] = true  (needed for RedHat Family)
-  * Used to enable needed repo for postgresql for RedHat family OS's
-* default['postgresql']['enable_pdgd_apt'] = true  (needed for Debian Family)
-  * Used to enable needed repo for postgresql for Debian family OS's
 
 
 Usage
