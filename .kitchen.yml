@@ -33,7 +33,7 @@ platforms:
     - recipe[yum]
 
 suites:
-  - name: aio-apache
+  - name: default
     run_list:
       - recipe[pythonstack::mysql_base]
       - recipe[pythonstack::postgresql_base]
