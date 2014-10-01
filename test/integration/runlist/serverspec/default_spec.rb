@@ -12,7 +12,7 @@ else
   describe service('apache2') do
     it { should be_enabled }
   end
-  apache2ctl = '/usr/sbin/apachectl'
+  apache2ctl = '/usr/sbin/apache2ctl'
 end
 describe port(80) do
   it { should be_listening }
@@ -30,7 +30,7 @@ describe port(11_211) do
   it { should be_listening }
 end
 
-# mysql-master
+# mysql base
 if os[:family] == 'RedHat'
   describe service('mysqld') do
     it { should be_enabled }
@@ -46,7 +46,7 @@ describe port(3306) do
   it { should be_listening }
 end
 
-# postgresql-master
+# postgresql base
 if os[:family] == 'RedHat'
   # process is named postgres
   describe service('postgres') do
@@ -56,15 +56,9 @@ if os[:family] == 'RedHat'
   describe service('postgresql') do
     it { should be_enabled }
   end
-  describe service('postgres') do
-    it { should be_running }
-  end
 else
-  describe service('postgresql') do
+  describe service('postgres') do
     it { should be_enabled }
-    it { should be_running }
-  end
-  describe service('postgresql') do
     it { should be_running }
   end
 end
@@ -109,7 +103,7 @@ describe port(6379) do
   it { should be_listening }
 end
 
-# pythonstack.ini
+# python
 describe file('/etc/pythonstack.ini') do
   it { should be_file }
 end

@@ -7,9 +7,6 @@ driver_config:
 provisioner:
   name: chef_zero
   attributes:
-    pythonstack:
-      demo:
-        enabled: true
     authorization:
       sudo:
         users: ['vagrant']
@@ -43,6 +40,10 @@ suites:
       - recipe[pythonstack::rabbitmq]
       - recipe[pythonstack::redis_single]
       - recipe[pythonstack::application_python]
+    attributes:
+      pythonstack:
+        demo:
+          enabled: true
 
   - name: aio-nginx
     run_list:
@@ -57,22 +58,59 @@ suites:
     attributes:
       pythonstack:
         webserver: "nginx"
+        demo:
+          enabled: true
 
-  - name: application_python_apache
+  - name: runlist
+    run_list:
+      - recipe[pythonstack::mysql_base]
+      - recipe[pythonstack::postgresql_base]
+      - recipe[pythonstack::mongodb_standalone]
+      - recipe[pythonstack::memcache]
+      - recipe[pythonstack::varnish]
+      - recipe[pythonstack::rabbitmq]
+      - recipe[pythonstack::redis_single]
+      - recipe[pythonstack::application_python]
+      - recipe[wrapper::demo]
+
+  - name: wrapper
+    run_list:
+      - recipe[wrapper]
+    attributes:
+      pythonstack:
+        webserver: "nginx"
+        demo:
+          enabled: true
+
+  - name: application-python-apache
     run_list:
       - recipe[pythonstack::application_python]
+    attributes:
+      pythonstack:
+        demo:
+          enabled: true
 
-  - name: application_python_nginx
+  - name: application-python-nginx
     run_list:
       - recipe[pythonstack::application_python]
     attributes:
       pythonstack:
         webserver: "nginx"
+        demo:
+          enabled: true
 
   - name: mysql
     run_list:
       - recipe[pythonstack::mysql_base]
+    attributes:
+      pythonstack:
+        demo:
+          enabled: true
 
   - name: postgresql
     run_list:
       - recipe[pythonstack::postgresql_base]
+    attributes:
+      pythonstack:
+        demo:
+          enabled: true

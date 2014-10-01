@@ -4,26 +4,25 @@
   "json_class": "Chef::Node",
   "automatic": {
     "hostname": "vagrant.vm",
+    "ipaddress": "192.168.0.23",
     "recipes": [
-      "pythonstack::mysql_base",
       "pythonstack::mysql_slave"
-    ],
-    "roles": [
-      "database_slave"
     ]
   },
   "normal": {
-    "tags": [
-      "mysql_slave"
-    ]
   },
   "chef_type": "node",
   "default": {
+    "pythonstack": {
+      "demo": {
+        "enabled": true
+      }
+    }
   },
   "override": {
   },
   "run_list": [
-    "role[database_slave]"
+    "recipe[pythonstack::mysql_slave]"
   ],
-  "ipaddress": "192.168.0.23"
+  "tags": [ "mysql_slave" ]
 }

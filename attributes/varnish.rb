@@ -17,4 +17,7 @@
 # limitations under the License.
 #
 
-default['pythonstack']['varnish']['multi'] = true
+stackname = 'pythonstack'
+
+default[stackname]['varnish']['multi'] = true
+default[stackname]['varnish']['backend_nodes'] = []

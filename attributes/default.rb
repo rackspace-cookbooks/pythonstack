@@ -18,8 +18,16 @@
 # limitations under the License.
 #
 
-node.set['pythonstack']['newrelic']['application_monitoring'] = ''
-default['pythonstack']['webserver'] = 'apache'
-default['pythonstack']['ini']['cookbook'] = 'pythonstack'
+stackname = 'pythonstack'
 
-default['pythonstack']['code-deployment']['enabled'] = true
+default[stackname]['newrelic']['application_monitoring'] = ''
+default[stackname]['webserver'] = 'apache'
+default[stackname]['ini']['cookbook'] = stackname
+
+default[stackname]['mysql']['databases'] = {}
+default[stackname]['apache']['sites'] = {}
+default[stackname]['nginx']['sites'] = {}
+
+default[stackname]['webserver_deployment']['enabled'] = true
+default[stackname]['code-deployment']['enabled'] = true
+default[stackname]['db-autocreate']['enabled'] = true

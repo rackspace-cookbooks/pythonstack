@@ -20,12 +20,17 @@
 
 stackname = 'pythonstack'
 
-# set up demo if needed
-include_recipe "#{stackname}::default"
-
+# plugin depends
+if platform_family?('rhel')
+  include_recipe 'yum'
+  include_recipe 'yum-epel'
+  include_recipe 'yum-ius'
+elsif platform_family?('debian')
+  include_recipe 'apt'
+end
 include_recipe 'build-essential'
-include_recipe "#{stackname}::#{node[stackname]['webserver']}"
 include_recipe 'git'
+
 include_recipe 'python::package'
 include_recipe 'python::pip'
 python_pip 'setuptools' do
@@ -33,22 +38,24 @@ python_pip 'setuptools' do
   version node['python']['setuptools_version']
 end
 
-case node[stackname]['webserver']
-when 'apache'
-  node.default[stackname]['gluster_mountpoint'] = node['apache']['docroot_dir']
-when 'nginx'
+# set demo if needed
+node.default[stackname][node[stackname]['webserver']]['sites'] = node[stackname]['demo'][node[stackname]['webserver']]['sites'] if node[stackname]['demo']['enabled']
+
+include_recipe "#{stackname}::#{node[stackname]['webserver']}" if %w(apache nginx).include?(node[stackname]['webserver'])
+
+if node[stackname]['webserver'] == 'nginx'
   node.default[stackname]['gluster_mountpoint'] = node['nginx']['default_root']
+elsif node[stackname]['webserver'] == 'apache'
+  node.default[stackname]['gluster_mountpoint'] = node['apache']['docroot_dir']
 else
-  node.default[stackname]['gluster_mountpoint'] = '/var/www'
+  node.default_unless[stackname]['gluster_mountpoint'] = '/var/www'
 end
 
 include_recipe 'python'
 include_recipe 'mysql::client'
 
 python_pip 'distribute'
-if platform_family?('debian')
-  package 'python-mysqldb'
-end
+package 'python-mysqldb' if platform_family?('debian')
 python_pip 'configparser'
 python_pip 'sqlalchemy'
 python_pip 'flask'
@@ -73,12 +80,10 @@ if gluster_cluster.key?('nodes')
   end
   node.set_unless[stackname]['gluster_connect_ip'] = gluster_ips.sample
 
-  # install gluster mount
   package 'glusterfs-client' do
     action :install
   end
 
-  # set up the mountpoint
   mount 'webapp-mountpoint' do
     fstype 'glusterfs'
     device "#{node[stackname]['gluster_connect_ip']}:/#{node['rackspace_gluster']['config']['server']['glusters'].values[0]['volume']}"
@@ -88,24 +93,28 @@ if gluster_cluster.key?('nodes')
 end
 
 if node.deep_fetch(stackname, 'code-deployment', 'enabled')
-  node[node[stackname]['webserver']]['sites'].each do | site_name, site_opts |
-    application site_name do
-      path site_opts['docroot']
-      owner node[node[stackname]['webserver']]['user']
-      group node[node[stackname]['webserver']]['group']
-      deploy_key site_opts['deploy_key']
-      repository site_opts['repository']
-      revision site_opts['revision']
-      restart_command "if [ -f /var/run/uwsgi-#{site_name}.pid ] && ps -p `cat /var/run/uwsgi-         #{site_name}.pid` >/dev/null;
-      then kill `cat /var/run/uwsgi-#{site_name}.pid`; fi" if node[stackname]['webserver'] == 'nginx'
+  node[stackname][node[stackname]['webserver']]['sites'].each do |port, sites|
+    sites.each do |site_name, site_opts|
+      application "#{site_name}-#{port}" do
+        path site_opts['docroot']
+        owner node[node[stackname]['webserver']]['user']
+        group node[node[stackname]['webserver']]['group']
+        deploy_key site_opts['deploy_key']
+        repository site_opts['repository']
+        revision site_opts['revision']
+        restart_command "if [ -f /var/run/uwsgi-#{site_name}-#{site_opts['uwsgi_port']}.pid ] && ps -p `cat /var/run/uwsgi-#{site_name}-#{site_opts['uwsgi_port']}.pid` >/dev/null;
+        then kill `cat /var/run/uwsgi-#{site_name}-#{site_opts['uwsgi_port']}.pid`; fi" if node[stackname]['webserver'] == 'nginx'
+      end
     end
   end
 end
 
+# the template handles nil, so this is an exception where it's okay to default to nil
+mysql_node = nil
+rabbit_node = nil
+
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  mysql_node = nil
-  rabbit_node = nil
 else
   mysql_node = search('node', "recipes:#{stackname}\\:\\:mysql_master AND chef_environment:#{node.chef_environment}").first
   rabbit_node = search('node', "recipes:#{stackname}\\:\\:rabbitmq AND chef_environment:#{node.chef_environment}").first
@@ -121,23 +130,36 @@ template "#{stackname}.ini" do
     cookbook_name: cookbook_name,
     # if it responds then we will create the config section in the ini file
     mysql: if mysql_node.respond_to?('deep_fetch')
-             if mysql_node.deep_fetch(node[stackname]['webserver'], 'sites').nil?
+             # if statement still needed to protect against no sites defined and a third party webserver in use (since we don't initialize that hash)
+             if mysql_node.deep_fetch(stackname, node[stackname]['webserver'], 'sites').nil?
                nil
              else
-               mysql_node.deep_fetch(node[stackname]['webserver'], 'sites').values[0]['mysql_password'].nil? ? nil : mysql_node
+               # we didn't set up any databases, protects the next elsif statement
+               if mysql_node.deep_fetch(stackname, node[stackname]['webserver'], 'sites').empty? &&
+                  mysql_node.deep_fetch(stackname, 'mysql', 'databases').empty?
+                 nil
+               # sites set up with no database
+               elsif mysql_node.deep_fetch(stackname, node[stackname]['webserver'], 'sites').values[0].values[0].key?('mysql_password') &&
+                     mysql_node.deep_fetch(stackname, node[stackname], 'mysql', 'databases').empty?
+                 nil
+               # databases are defined in either the sites or the databases hash
+               else
+                 mysql_node
+               end
              end
+           else
+             nil
            end,
     # need to do here because sugar is not available inside the template
-    rabbit_host: if rabbit_node.respond_to?('deep_fetch')
-                   best_ip_for(rabbit_node)
-                 else
-                   nil
-                 end,
-    rabbit_passwords: if rabbit_node.respond_to?('deep_fetch')
-                        rabbit_node.deep_fetch(stackname, 'rabbitmq', 'passwords').values[0].nil? == true ? nil : rabbit_node[stackname]['rabbitmq']['passwords']
-                      else
-                        nil
-                      end
+    rabbit: if rabbit_node.respond_to?('deep_fetch')
+              if rabbit_node.deep_fetch(stackname, node[stackname]['webserver'], 'sites').nil?
+                nil
+              else
+                rabbit_node.deep_fetch(stackname, 'rabbitmq', 'passwords').values[0].nil? ? nil : rabbit_node
+              end
+            else
+              nil
+            end
   )
   action 'create'
   # For Nginx the service Uwsgi subscribes to the template, as we need to restart each Uwsgi service
@@ -151,11 +173,11 @@ node.set_unless['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email
 node.default['rackspace_cloudbackup']['backups'] =
   [
     {
-      location: node[node[stackname]['webserver']]['docroot_dir'],
+      location: node[stackname]['gluster_mountpoint'],
       enable: node[stackname]['rackspace_cloudbackup']['http_docroot']['enable'],
       comment: 'Web Content Backup',
       cloud: { notify_email: node['rackspace_cloudbackup']['backups_defaults']['cloud_notify_email'] }
     }
   ]
 
-tag('python_app_node')
+tag("#{stackname.gsub('stack', '')}_app_node")

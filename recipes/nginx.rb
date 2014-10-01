@@ -18,14 +18,10 @@
 # limitations under the License.
 #
 
-include_recipe 'chef-sugar'
+stackname = 'pythonstack'
+return 0 unless node[stackname]['webserver_deployment']['enabled']
 
-# If not defined drop out
-if node.deep_fetch('nginx', 'sites').nil?
-  return 0
-elsif node.deep_fetch('nginx', 'sites').values[0].nil?
-  return 0
-end
+include_recipe 'chef-sugar'
 
 if rhel?
   include_recipe 'yum-epel'
@@ -40,9 +36,9 @@ end
 
 # Include the necessary recipes.
 %w(
+  apt
   platformstack::monitors
   platformstack::iptables
-  apt
 ).each do |recipe|
   include_recipe recipe
 end
@@ -52,8 +48,12 @@ include_recipe 'build-essential'
 include_recipe 'uwsgi'
 
 # Pid is different on Ubuntu 14, causing nginx service to fail https://github.com/miketheman/nginx/issues/248
-if ubuntu_trusty?
-  node.default['nginx']['pid'] = '/run/nginx.pid'
+node.default['nginx']['pid'] = '/run/nginx.pid' if ubuntu_trusty?
+# Uwsgi path is different on Centos
+if rhel?
+  node.default['nginx']['uwsgi']['bin'] = '/usr/bin/uwsgi'
+else
+  node.default['nginx']['uwsgi']['bin'] = '/usr/local/bin/uwsgi'
 end
 
 # Install Nginx
@@ -69,87 +69,84 @@ if !node['nginx']['default_site_enabled'] && (node['platform_family'] == 'rhel' 
   end
 end
 
+listen_ports = []
 # Create the sites.
-node['nginx']['sites'].each do |site_name, site_opts|
-  add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{site_opts['port']} -j ACCEPT", 100, 'Allow access to nginx')
+node[stackname]['nginx']['sites'].each do |port, sites|
+  listen_ports |= [port]
+  add_iptables_rule('INPUT', "-m tcp -p tcp --dport #{port} -j ACCEPT", 100, 'Allow access to nginx')
+  sites.each do |site_name, site_opts|
+    # set up uwsgi per site/port combo
+    template "#{site_name}-#{site_opts['uwsgi_port']}-uwsgi.ini" do
+      cookbook site_opts['uwsgi_cookbook']
+      source site_opts['uwsgi_template']
+      path "#{node['nginx']['dir']}/#{site_name}-#{site_opts['uwsgi_port']}-uwsgi.ini"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        name: site_name,
+        home_path: "#{site_opts['docroot']}/current",
+        pid_path: "/var/run/uwsgi-#{site_name}-#{port}.pid",
+        uwsgi_port: site_opts['uwsgi_port'],
+        stats_port: site_opts['uwsgi_stats_port'],
+        app: site_opts['app'],
+        uid: node['nginx']['user'],
+        gid: node['nginx']['group'],
+        options: site_opts['uwsgi_options']
+      )
+    end
+    uwsgi_service "#{site_name}-#{site_opts['uwsgi_port']}" do
+      pid_path "/var/run/uwsgi-#{site_name}-#{site_opts['uwsgi_port']}.pid"
+      home_path "#{site_opts['docroot']}/current"
+      uwsgi_bin node['nginx']['uwsgi']['bin']
+      config_file "#{node['nginx']['dir']}/#{site_name}-#{site_opts['uwsgi_port']}-uwsgi.ini"
+    end
+    # Reload service if pythonstack.ini has been modified
+    service "uwsgi-#{site_name}-#{site_opts['uwsgi_port']}" do
+      supports restart: true, reload: true
+      subscribes :restart, 'template[pythonstack.ini]', :delayed
+    end
 
-  # Uwsgi path is different on Centos
-  if rhel?
-    node.default['nginx']['uwsgi']['bin'] = '/usr/bin/uwsgi'
-  else
-    node.default['nginx']['uwsgi']['bin'] = '/usr/local/bin/uwsgi'
-  end
-
-  template "#{site_name}-uwsgi-ini" do
-    cookbook 'pythonstack'
-    source 'nginx/uwsgi.ini.erb'
-    path "#{node['nginx']['dir']}/#{site_name}.ini"
-    owner 'root'
-    group 'root'
-    mode '0644'
-    variables(
-      name: site_name,
-      home_path: "#{site_opts['docroot']}/current",
-      pid_path: "/var/run/uwsgi-#{site_name}.pid",
-      uwsgi_port: site_opts['uwsgi_port'],
-      stats_port: site_opts['uwsgi_stats_port'],
-      app: site_opts['app'],
-      uid: node['nginx']['user'],
-      gid: node['nginx']['group'],
-      options: site_opts['uwsgi_options']
-    )
-  end
-
-  uwsgi_service site_name do
-    pid_path "/var/run/uwsgi-#{site_name}.pid"
-    home_path "#{site_opts['docroot']}/current"
-    uwsgi_bin node['nginx']['uwsgi']['bin'] if node['nginx']['uwsgi']['bin']
-    config_file "#{node['nginx']['dir']}/#{site_name}.ini"
-  end
-
-  # Reload service if pythonstack.ini has been modified
-  service "uwsgi-#{site_name}" do
-    supports restart: true, reload: true
-    subscribes :restart, 'template[pythonstack.ini]', :delayed
-  end
-
-  # Nginx set up
-  template site_name do
-    cookbook site_opts['cookbook']
-    source "nginx/sites/#{site_name}.erb"
-    path "#{node['nginx']['dir']}/sites-available/#{site_name}"
-    owner 'root'
-    group 'root'
-    mode '0644'
-    variables(
-      name: site_name,
-      port: site_opts['port'],
-      uwsgi_port: site_opts['uwsgi_port'],
-      server_name: site_opts['server_name'],
-      server_aliases: site_opts['server_alias'],
-      docroot: site_opts['docroot'],
-      errorlog: site_opts['errorlog'],
-      customlog: site_opts['customlog']
-    )
-    notifies :reload, 'service[nginx]'
-  end
-  nginx_site site_name do
-    enable true
-    notifies :reload, 'service[nginx]'
-  end
-  template "http-monitor-#{site_opts['server_name']}" do
-    cookbook 'pythonstack'
-    source 'monitoring-remote-http.yaml.erb'
-    path "/etc/rackspace-monitoring-agent.conf.d/#{site_opts['server_name']}-http-monitor.yaml"
-    owner 'root'
-    group 'root'
-    mode '0644'
-    variables(
-      http_port: site_opts['port'],
-      server_name: site_opts['server_name']
-    )
-    notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
-    action 'create'
-    only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+    # Nginx set up
+    template "#{site_name}-#{port}" do
+      cookbook site_opts['cookbook']
+      source site_opts['template']
+      path "#{node['nginx']['dir']}/sites-available/#{site_name}-#{port}.conf"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        name: site_name,
+        port: port,
+        uwsgi_port: site_opts['uwsgi_port'],
+        server_name: site_opts['server_name'],
+        server_aliases: site_opts['server_alias'],
+        docroot: site_opts['docroot'],
+        errorlog: site_opts['errorlog'],
+        customlog: site_opts['customlog']
+      )
+      notifies :reload, 'service[nginx]'
+    end
+    nginx_site "#{site_name}-#{port}.conf" do
+      enable true
+      notifies :reload, 'service[nginx]'
+    end
+    template "http-monitor-#{site_opts['server_name']}-#{port}" do
+      cookbook stackname
+      source 'monitoring-remote-http.yaml.erb'
+      path "/etc/rackspace-monitoring-agent.conf.d/#{site_opts['server_name']}-#{port}-http-monitor.yaml"
+      owner 'root'
+      group 'root'
+      mode '0644'
+      variables(
+        http_port: port,
+        server_name: site_opts['server_name']
+      )
+      notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
+      action 'create'
+      only_if { node.deep_fetch('platformstack', 'cloud_monitoring', 'enabled') }
+    end
   end
 end
+
+node.default['nginx']['listen_ports'] = listen_ports
