@@ -146,6 +146,8 @@ default['pythonstack']['demo']['nginx']['sites'][port1][site2]['deploy_key']    
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['uwsgi_port']     = 20_004
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['uwsgi_stats_port'] = '1720'
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['uwsgi_options']  = {}
+default['pythonstack']['demo']['nginx']['sites'][port2][site2]['uwsgi_template'] = 'nginx/uwsgi.ini.erb'
+default['pythonstack']['demo']['nginx']['sites'][port2][site2]['uwsgi_cookbook'] = 'pythonstack'
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['template']       = "nginx/sites/#{site2}-#{port2}.erb"
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['cookbook']       = 'pythonstack'
 default['pythonstack']['demo']['nginx']['sites'][port2][site2]['server_name']    = site2
