@@ -20,4 +20,4 @@
 stackname = 'pythonstack'
 
 default[stackname]['varnish']['multi'] = true
-default[stackname]['varnish']['backend_nodes'] = []
+default[stackname]['varnish']['backend_nodes'] = {}
