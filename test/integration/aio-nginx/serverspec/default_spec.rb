@@ -32,7 +32,7 @@ describe 'configures and runs Uwsgi' do
   describe file('/var/run/uwsgi-example.com-80.pid') do
     it { should be_file }
   end
-  describe file('/etc/nginx/example.com-80.ini') do
+  describe file('/etc/nginx/example.com-80-uwsgi.ini') do
     it { should be_file }
   end
   describe port(20_001) do
