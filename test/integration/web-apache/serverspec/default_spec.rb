@@ -18,7 +18,7 @@ describe port(80) do
   it { should be_listening }
 end
 
-# pythonstack.ini
+# python
 describe file('/etc/pythonstack.ini') do
   it { should be_file }
 end

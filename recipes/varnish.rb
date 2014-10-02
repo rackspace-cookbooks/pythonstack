@@ -21,11 +21,15 @@
 stackname = 'pythonstack'
 
 include_recipe 'chef-sugar'
+include_recipe 'platformstack::iptables'
 if platform_family?('debian')
   include_recipe 'apt'
 else
   include_recipe 'yum-epel'
 end
+
+# include demo if needed
+node.default[stackname][node[stackname]['webserver']]['sites'] = node[stackname]['demo'][node[stackname]['webserver']]['sites'] if node[stackname]['demo']['enabled']
 
 add_iptables_rule('INPUT', "-p tcp --dport #{node['varnish']['listen_port']} -j ACCEPT", 9997, 'allow web browsers to connect')
 
@@ -36,29 +40,25 @@ node.set['platformstack']['cloud_monitoring']['plugins']['varnish']['disabled'] 
 node.default['varnish']['backend_port'] = node[node[stackname]['webserver']]['listen_ports'].first
 
 # pull a list of backend hosts to populate the template
-# node.default[stackname]['varnish']['backend_hosts'] = Hash.new
 backend_hosts = {}
 if Chef::Config[:solo]
   Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  backend_nodes = nil
+  # build a list of nodes from the backend_nodes attribute if we aren't doing search
+  backend_nodes = ({}).merge(node['pythonstack']['varnish']['backend_nodes'] || {})
 else
   backend_nodes = search('node', "tags:#{stackname.gsub('stack', '')}_app_node AND chef_environment:#{node.chef_environment}")
+  Chef::Log.warn('Search for varnish backend nodes returned no results, may be skipped...') if backend_nodes.nil? || backend_nodes.empty?
 end
 
+# convert backend_nodes into backend_hosts list
 backend_nodes.each do |backend_node|
-  if backend_node.deep_fetch(node[stackname]['webserver'], 'sites').nil?
-    errmsg = 'Did not find sites, default.vcl not configured'
-    Chef::Log.warn(errmsg)
-  else
-    backend_node[node[stackname]['webserver']]['sites'].each do |site_name|
-      site_name = site_name[0]
-      site = backend_node[node[stackname]['webserver']]['sites'][site_name]
+  backend_node[stackname][node[stackname]['webserver']]['sites'].each do |port, sites|
+    sites.each do |site_name, site_opts|
+      found_ip = best_ip_for(backend_node)
+      Chef::Log.warn("Could not determine IP for varnish backend #{backend_node}, skipping it...") if found_ip.nil?
+      next if found_ip.nil?
       backend_hosts.merge!(
-        best_ip_for(backend_node) => {
-          site['port'] => {
-            site_name => site_name
-          }
-        }
+        found_ip => { port => { site_name: site_name } }
       )
     end
   end
@@ -67,7 +67,7 @@ end
 node.default[stackname]['varnish']['backends'] = backend_hosts
 
 # only set if we have backends to populate (aka not on first run with an all in one node)
-if backend_nodes.first.nil?
+if backend_hosts.first.nil?
   # if our backends go away we needs this
   node.default['varnish']['vcl_cookbook'] = 'varnish'
   node.default['varnish']['vcl_source'] = 'default.vcl.erb'

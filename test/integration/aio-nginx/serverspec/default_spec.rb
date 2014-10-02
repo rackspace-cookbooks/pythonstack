@@ -12,39 +12,34 @@ describe 'configures and runs Nginx' do
     it { should be_listening }
   end
 end
-
-# Uwsgi
-describe 'configures and runs Uwsgi' do
-  describe file('/var/run/uwsgi-example.com.pid') do
-    it { should be_file }
-  end
-  describe file('/etc/nginx/example.com.ini') do
-    it { should be_file }
-  end
-  describe port(8080) do
-    it { should be_listening }
-  end
-  describe process('uwsgi') do
-    it { should be_running }
-  end
-end
-
-# more nginx
 describe 'configures our application' do
-  describe file('/etc/nginx/sites-available/example.com') do
+  describe file('/etc/nginx/sites-available/example.com-80.conf') do
     it { should be_file }
   end
-  describe file('/etc/nginx/sites-enabled/example.com') do
-    it { should be_linked_to '/etc/nginx/sites-available/example.com' }
+  describe file('/etc/nginx/sites-enabled/example.com-80.conf') do
+    it { should be_linked_to '/etc/nginx/sites-available/example.com-80.conf' }
   end
   describe file('/var/www/example.com') do
     it { should be_directory }
   end
-  describe file('/etc/pythonstack.ini') do
-    it { should be_file }
-  end
   describe 'the app returns the expected content' do
     it { expect(page_returns).to match(/MySQL Service/) }
+  end
+end
+
+# Uwsgi
+describe 'configures and runs Uwsgi' do
+  describe file('/var/run/uwsgi-example.com-80.pid') do
+    it { should be_file }
+  end
+  describe file('/etc/nginx/example.com-20001-uwsgi.ini') do
+    it { should be_file }
+  end
+  describe port(20_001) do
+    it { should be_listening }
+  end
+  describe process('uwsgi') do
+    it { should be_running }
   end
 end
 
@@ -57,7 +52,7 @@ describe port(11_211) do
   it { should be_listening }
 end
 
-# mysql-master
+# mysql base
 if os[:family] == 'RedHat'
   describe service('mysqld') do
     it { should be_enabled }
@@ -73,7 +68,7 @@ describe port(3306) do
   it { should be_listening }
 end
 
-# postgresql-master
+# postgresql base
 if os[:family] == 'RedHat'
   # process is named postgres
   describe service('postgres') do
@@ -83,15 +78,9 @@ if os[:family] == 'RedHat'
   describe service('postgresql') do
     it { should be_enabled }
   end
-  describe service('postgres') do
-    it { should be_running }
-  end
 else
-  describe service('postgresql') do
+  describe service('postgres') do
     it { should be_enabled }
-    it { should be_running }
-  end
-  describe service('postgresql') do
     it { should be_running }
   end
 end

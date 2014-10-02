@@ -1,7 +1,7 @@
 # Encoding: utf-8
 #
 # Cookbook Name:: pythonstack
-# Recipe:: memcached
+# Recipe:: memcache
 #
 # Copyright 2014, Rackspace Hosting
 #
@@ -18,9 +18,7 @@
 # limitations under the License.
 #
 
-if platform_family?('debian')
-  include_recipe 'apt'
-end
+include_recipe 'apt' if platform_family?('debian')
 include_recipe 'memcached'
 
 # enable agent for cloud monitoring

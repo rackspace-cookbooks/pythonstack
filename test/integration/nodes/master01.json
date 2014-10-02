@@ -4,29 +4,25 @@
   "json_class": "Chef::Node",
   "automatic": {
     "hostname": "vagrant.vm",
+    "ipaddress": "192.168.0.23",
     "recipes": [
-      "pythonstack::mysql_base",
       "pythonstack::mysql_master"
-    ],
-    "roles": [
-      "database_master"
     ]
   },
   "normal": {
-    "tags": [
-      "mysql_master"
-    ]
   },
   "chef_type": "node",
   "default": {
+    "pythonstack": {
+      "demo": {
+        "enabled": true
+      }
+    }
   },
   "override": {
   },
   "run_list": [
-    "role[database_master]"
+    "recipe[pythonstack::mysql_master]"
   ],
-  "ipaddress": "192.168.0.23",
-  "mysql": {
-    "server_repl_password": "guudpasswerd"
-  }
+  "tags": [ "mysql_master" ]
 }
