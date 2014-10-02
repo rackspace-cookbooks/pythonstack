@@ -76,11 +76,6 @@ suites:
   - name: wrapper
     run_list:
       - recipe[wrapper]
-    attributes:
-      pythonstack:
-        webserver: "nginx"
-        demo:
-          enabled: true
 
   - name: application-python-apache
     run_list:
