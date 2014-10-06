@@ -24,5 +24,5 @@ describe file('/etc/pythonstack.ini') do
 end
 
 describe command("#{apache2ctl} -M") do
-  it { should return_stdout(/^ ssl_module/) }
+  its(:stdout) { should match(/^ ssl_module/) }
 end
