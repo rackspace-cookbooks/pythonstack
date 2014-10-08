@@ -2,15 +2,13 @@
 require 'serverspec'
 require 'net/http'
 
-include Serverspec::Helper::Exec
-include Serverspec::Helper::DetectOS
+set :backend, :exec
+set :path, '/sbin:/usr/local/sbin:/bin:/usr/bin:$PATH'
 
-RSpec.configure do |c|
-  c.before :all do
-    c.path = '/sbin:/usr/bin'
-  end
-end
-
-def page_returns(url = 'http://localhost/')
-  Net::HTTP.get(URI(url))
+def page_returns(url = 'http://localhost/', host = 'example.com')
+  uri = URI.parse(url)
+  http = Net::HTTP.new(uri.host, uri.port)
+  req = Net::HTTP::Get.new(uri.request_uri)
+  req.initialize_http_header('Host' => host)
+  http.request(req).body
 end
