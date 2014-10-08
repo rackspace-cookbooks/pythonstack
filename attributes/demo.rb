@@ -21,7 +21,7 @@ default['pythonstack']['demo']['enabled'] = false
 
 site1 = 'example.com'
 site2 = 'test.com'
-version1 = '0.0.6'
+version1 = '0.0.8'
 port1 = '80'
 port2 = '8080'
 
