@@ -19,7 +19,7 @@
 #
 
 stackname = 'pythonstack'
-default['stack-commons']['stackname'] = 'pythonstack'
+default['stack_commons']['stackname'] = 'pythonstack'
 
 default[stackname]['newrelic']['application_monitoring'] = ''
 default[stackname]['webserver'] = 'apache'
