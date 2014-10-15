@@ -72,6 +72,10 @@ suites:
       - recipe[pythonstack::redis_single]
       - recipe[pythonstack::application_python]
       - recipe[wrapper::demo]
+    attributes:
+      pythonstack:
+        demo:
+          enabled: true
 
   - name: wrapper
     run_list:
