@@ -19,7 +19,7 @@
 #
 
 stackname = 'pythonstack'
-default['stack_commons']['stackname'] = 'pythonstack'
+default['stack_commons']['stackname'] = stackname
 
 default[stackname]['newrelic']['application_monitoring'] = ''
 default[stackname]['webserver'] = 'apache'
@@ -28,7 +28,10 @@ default[stackname]['ini']['cookbook'] = stackname
 default[stackname]['mysql']['databases'] = {}
 default[stackname]['apache']['sites'] = {}
 default[stackname]['nginx']['sites'] = {}
+default[stackname]['varnish']['backend_nodes'] = {}
+default[stackname]['rabbitmq']['passwords'] = {}
 
 default[stackname]['webserver_deployment']['enabled'] = true
 default[stackname]['code-deployment']['enabled'] = true
 default[stackname]['db-autocreate']['enabled'] = true
+default[stackname]['varnish']['multi'] = true
