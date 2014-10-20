@@ -3,6 +3,10 @@ pythonstack CHANGELOG
 =====================
 
 
+1.0.4
+-----
+- [Julien Berard] - Use stack_commons for pythonstack::memcache
+
 1.0.3
 -----
 - [Julien Berard] - Use stack_commons for pythonstack::mongodb_standalone
