@@ -14,6 +14,7 @@
   pythonstack::rabbitmq
   pythonstack::redis_single
   pythonstack::application_python
+  wrapper::demo
 ).each do |recipe|
   include_recipe recipe
 end

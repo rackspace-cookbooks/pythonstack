@@ -32,18 +32,7 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[pythonstack::mysql_base]
-      - recipe[pythonstack::postgresql_base]
-      - recipe[pythonstack::mongodb_standalone]
-      - recipe[pythonstack::memcache]
-      - recipe[pythonstack::varnish]
-      - recipe[pythonstack::rabbitmq]
-      - recipe[pythonstack::redis_single]
-      - recipe[pythonstack::application_python]
-    attributes:
-      pythonstack:
-        demo:
-          enabled: true
+      - recipe[wrapper]
 
   - name: aio-nginx
     run_list:
@@ -60,26 +49,6 @@ suites:
         webserver: "nginx"
         demo:
           enabled: true
-
-  - name: runlist
-    run_list:
-      - recipe[pythonstack::mysql_base]
-      - recipe[pythonstack::postgresql_base]
-      - recipe[pythonstack::mongodb_standalone]
-      - recipe[pythonstack::memcache]
-      - recipe[pythonstack::varnish]
-      - recipe[pythonstack::rabbitmq]
-      - recipe[pythonstack::redis_single]
-      - recipe[pythonstack::application_python]
-      - recipe[wrapper::demo]
-    attributes:
-      pythonstack:
-        demo:
-          enabled: true
-
-  - name: wrapper
-    run_list:
-      - recipe[wrapper]
 
   - name: application-python-apache
     run_list:
