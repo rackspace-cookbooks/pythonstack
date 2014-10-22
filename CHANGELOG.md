@@ -1,7 +1,10 @@
-<<<<<<< HEAD
 pythonstack CHANGELOG
 =====================
 
+1.1.0
+-----
+
+- @martinb3 - Use stack_commons for pythonstack::redis*
 
 1.0.4
 -----
