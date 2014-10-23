@@ -5,7 +5,7 @@ maintainer_email 'rackspace-cookbooks@rackspace.com'
 license 'Apache 2.0'
 description 'Installs/Configures pythonstack'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '1.1.1'
+version '1.1.2'
 
 depends 'apache2'
 depends 'application'
@@ -17,8 +17,7 @@ depends 'database'
 depends 'git'
 depends 'memcached'
 depends 'mongodb'
-depends 'mysql'
-depends 'mysql-multi'
+depends 'mysql' # needed in the application_python recipe
 depends 'newrelic'
 depends 'newrelic_meetme_plugin'
 depends 'nginx'
