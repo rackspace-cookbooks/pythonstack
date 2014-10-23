@@ -1,6 +1,11 @@
 pythonstack CHANGELOG
 =====================
 
+1.2.0
+-----
+
+- @jujugrrr - Use stack_commons for pythonstack::newrelic
+
 1.1.0
 -----
 
