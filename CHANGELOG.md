@@ -1,9 +1,12 @@
 pythonstack CHANGELOG
 =====================
 
-1.2.0
+1.1.3
 -----
+- @jujugrrr - Clean memcached attributes, they are not required anymore as they are in stack_commons
 
+1.1.2
+-----
 - @jujugrrr - Use stack_commons for pythonstack::newrelic
 
 1.1.0
