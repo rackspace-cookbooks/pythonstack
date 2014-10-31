@@ -159,7 +159,7 @@ template "#{stackname}.ini" do
   )
   action 'create'
   # For Nginx the service Uwsgi subscribes to the template, as we need to restart each Uwsgi service
-  notifies 'restart', 'service[apache2]', 'delayed' if node[stackname]['webserver'] == 'apache'
+  notifies 'restart', 'service[apache2]', 'delayed' if node[stackname]['webserver'] == 'apache' && node[stackname]['webserver_deployment']['enabled']
 end
 
 # backups
