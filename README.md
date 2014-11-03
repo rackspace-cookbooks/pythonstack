@@ -10,33 +10,29 @@ Requirements
 ------------
 #### Cookbooks
 
-* `newrelic_meetme_plugin`
-* `application_python`
-* `rackspace_gluster`
-* `build-essential`
-* `platformstack`
-* `application`
-* `redis-multi`
-* `mysql-multi`
-* `chef-sugar`
-* `memcached`
-* `database`
-* `newrelic`
-* `pg-multi`
-* `rabbitmq`
-* `mongodb`
-* `openssl`
-* `yum-epel`
-* `yum-ius`
 * `apache2`
-* `varnish`
+* `application`
+* `application_python`
+* `apt`
+* `chef-sugar`
+* `database`
+* `git`
+* `memcached`
+* `mongodb`
+* `mysql-multi`
+* `mysql`
+* `newrelic`
+* `openssl`
+* `pg-multi`
+* `platformstack`
 * `python`
-* `nginx`
+* `rackspace_gluster`
+* `redis-multi`
+* `stack_commons`
 * `uwsgi`
 * `yum`
-* `apt`
-* `git`  
-
+* `yum-epel`
+* `yum-ius`
 
 
 Recipes
