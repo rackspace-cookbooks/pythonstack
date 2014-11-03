@@ -66,11 +66,3 @@ suites:
         webserver: "nginx"
         demo:
           enabled: true
-
-  - name: postgresql
-    run_list:
-      - recipe[pythonstack::postgresql_base]
-    attributes:
-      pythonstack:
-        demo:
-          enabled: true
