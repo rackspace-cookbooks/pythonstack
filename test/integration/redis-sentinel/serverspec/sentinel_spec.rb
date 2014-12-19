@@ -30,5 +30,4 @@ end
 describe file('/etc/redis/sentinel_46379-sentinel.conf') do
   it { should contain('port 46379') }
   it { should contain('sentinel monitor sentinel_46379-sentinel 192.168.0.23 6379 2') }
-
 end
