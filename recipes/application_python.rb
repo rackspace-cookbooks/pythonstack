@@ -54,7 +54,6 @@ end
 include_recipe 'python'
 include_recipe 'mysql::client'
 
-python_pip 'distribute'
 package 'python-mysqldb' if platform_family?('debian')
 python_pip 'configparser'
 python_pip 'sqlalchemy'
