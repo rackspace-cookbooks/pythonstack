@@ -1,6 +1,10 @@
 pythonstack CHANGELOG
 =====================
 
+1.1.5
+-----
+- @jujugrrr - Clean syntax for metadata version constraint
+
 1.1.3
 -----
 - @jujugrrr - Clean memcached attributes, they are not required anymore as they are in stack_commons
