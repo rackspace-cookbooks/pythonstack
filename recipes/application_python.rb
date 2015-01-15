@@ -66,6 +66,7 @@ end
 python_pip 'pymongo'
 
 include_recipe 'chef-sugar'
+include_recipe "#{stackname}::default_unless"
 
 # if gluster is in our environment, install the utils and mount it to /var/www
 gluster_cluster = node['rackspace_gluster']['config']['server']['glusters'].values[0]
