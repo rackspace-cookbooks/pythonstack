@@ -6,13 +6,13 @@
 #
 #
 %w(
-  pythonstack::mysql_base
-  pythonstack::postgresql_base
-  pythonstack::mongodb_standalone
-  pythonstack::memcache
-  pythonstack::varnish
-  pythonstack::rabbitmq
-  pythonstack::redis_single
+  stack_commons::mysql_base
+  stack_commons::postgresql_base
+  stack_commons::mongodb_standalone
+  stack_commons::memcached
+  stack_commons::varnish
+  stack_commons::rabbitmq
+  stack_commons::redis_single
   pythonstack::application_python
   wrapper::demo
 ).each do |recipe|
