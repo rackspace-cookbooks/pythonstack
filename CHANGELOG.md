@@ -1,6 +1,11 @@
 pythonstack CHANGELOG
 =====================
 
+2.0.0
+-----
+- @prometheanfire - remove site_name from sites datastructure, it is now derived from server_aliases.first
+  - general cleanup of unused and unneeded templates
+
 1.1.5
 -----
 - @jujugrrr - Clean syntax for metadata version constraint

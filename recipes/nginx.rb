@@ -84,7 +84,7 @@ node[stackname]['nginx']['sites'].each do |port, sites|
       group 'root'
       mode '0644'
       variables(
-        name: site_name,
+        name: "#{site_name}-#{port}",
         home_path: "#{site_opts['docroot']}/current",
         pid_path: "/var/run/uwsgi-#{site_name}-#{port}.pid",
         uwsgi_port: site_opts['uwsgi_port'],
@@ -116,10 +116,9 @@ node[stackname]['nginx']['sites'].each do |port, sites|
       group 'root'
       mode '0644'
       variables(
-        name: site_name,
+        name: "#{site_name}-#{port}",
         port: port,
         uwsgi_port: site_opts['uwsgi_port'],
-        server_name: site_opts['server_name'],
         server_aliases: site_opts['server_alias'],
         docroot: site_opts['docroot'],
         errorlog: site_opts['errorlog'],
@@ -131,16 +130,16 @@ node[stackname]['nginx']['sites'].each do |port, sites|
       enable true
       notifies :reload, 'service[nginx]'
     end
-    template "http-monitor-#{site_opts['server_name']}-#{port}" do
+    template "http-monitor-#{site_name}-#{port}" do
       cookbook stackname
       source 'monitoring-remote-http.yaml.erb'
-      path "/etc/rackspace-monitoring-agent.conf.d/#{site_opts['server_name']}-#{port}-http-monitor.yaml"
+      path "/etc/rackspace-monitoring-agent.conf.d/#{site_name}-#{port}-http-monitor.yaml"
       owner 'root'
       group 'root'
       mode '0644'
       variables(
         http_port: port,
-        server_name: site_opts['server_name']
+        server_name: site_opts['server_alias'].first
       )
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
       action 'create'
