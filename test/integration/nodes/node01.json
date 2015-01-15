@@ -18,6 +18,9 @@
   },
   "chef_type": "node",
   "default": {
+    "stack_commons": {
+      "stackname": "pythonstack"
+    },
     "pythonstack": {
       "nginx": {
         "sites": {

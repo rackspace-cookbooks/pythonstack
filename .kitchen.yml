@@ -17,6 +17,8 @@ provisioner:
       server_debian_password: "randompass"
     holland:
       password: "randompass"
+    stack_commons:
+      stackname: "pythonstack"
 
 platforms:
   - name: ubuntu-12.04
@@ -36,13 +38,13 @@ suites:
 
   - name: aio-nginx
     run_list:
-      - recipe[pythonstack::mysql_base]
-      - recipe[pythonstack::postgresql_base]
-      - recipe[pythonstack::mongodb_standalone]
-      - recipe[pythonstack::memcache]
-      - recipe[pythonstack::varnish]
-      - recipe[pythonstack::rabbitmq]
-      - recipe[pythonstack::redis_single]
+      - recipe[stack_commons::mysql_base]
+      - recipe[stack_commons::postgresql_base]
+      - recipe[stack_commons::mongodb_standalone]
+      - recipe[stack_commons::memcached]
+      - recipe[stack_commons::varnish]
+      - recipe[stack_commons::rabbitmq]
+      - recipe[stack_commons::redis_single]
       - recipe[pythonstack::application_python]
     attributes:
       pythonstack:
