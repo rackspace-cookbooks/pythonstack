@@ -33,12 +33,12 @@ port_counter = 1 # needed for uwsgi auto port assignment
 node[stackname][node[stackname]['webserver']]['sites'].each do |port, sites|
   sites.each do |site_name, site_opts|
     node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['revision'] = 'master'
-    node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['repository'] = 'https://github.com/rackops/flask-test-app'
+    node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['repository'] = ''
     node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['deploy_key'] = '/root/.ssh/id_rsa'
     # now for some apache/nginx specific stuff
     next unless %w(apache nginx).include?(node[stackname]['webserver'])
     node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['cookbook'] = stackname
-    node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['server_alias'] = [site_name, "test.#{site_name}", "www.#{site_name}"]
+    node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['server_alias'] = []
     node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['docroot'] = "/var/www/#{site_name}/#{port}"
     node.default_unless[stackname][node[stackname]['webserver']]['sites'][port][site_name]['customlog'] =
       "#{node[node[stackname]['webserver']]['log_dir']}/#{site_name}-#{port}-access.log combined"
