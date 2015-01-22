@@ -120,7 +120,7 @@ node[stackname]['nginx']['sites'].each do |port, sites|
         name: "#{site_name}-#{port}",
         port: port,
         uwsgi_port: site_opts['uwsgi_port'],
-        server_aliases: site_opts['server_alias'],
+        server_aliases: site_opts['server_alias'].empty? ? [site_name] : site_opts['server_alias'],
         docroot: site_opts['docroot'],
         errorlog: site_opts['errorlog'],
         customlog: site_opts['customlog']
@@ -140,7 +140,7 @@ node[stackname]['nginx']['sites'].each do |port, sites|
       mode '0644'
       variables(
         http_port: port,
-        server_name: site_opts['server_alias'].first
+        server_name: site_opts['monitoring_hostname']
       )
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
       action 'create'

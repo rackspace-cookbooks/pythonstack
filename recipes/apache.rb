@@ -58,6 +58,7 @@ node[stackname]['apache']['sites'].each do |port, sites|
       port port
       cookbook site_opts['cookbook']
       template site_opts['template']
+      server_name site_opts['server_name']
       server_aliases site_opts['server_alias']
       docroot site_opts['docroot']
       allow_override site_opts['allow_override']
@@ -75,7 +76,7 @@ node[stackname]['apache']['sites'].each do |port, sites|
       mode '0644'
       variables(
         http_port: port,
-        server_name: site_opts['server_alias'].first
+        server_name: site_opts['monitoring_hostname']
       )
       notifies 'restart', 'service[rackspace-monitoring-agent]', 'delayed'
       action 'create'
