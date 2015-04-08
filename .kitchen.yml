@@ -19,6 +19,11 @@ provisioner:
       password: "randompass"
     stack_commons:
       stackname: "pythonstack"
+    pythonstack:
+      demo:
+        enabled: true
+      webserver_deployment:
+        enabled: true
 
 platforms:
   - name: ubuntu-12.04
@@ -35,36 +40,13 @@ suites:
   - name: default
     run_list:
       - recipe[wrapper]
+    attributes:
+      pythonstack:
+        webserver: "apache"
 
-  - name: aio-nginx
+  - name: default-nginx
     run_list:
-      - recipe[stack_commons::mysql_base]
-      - recipe[stack_commons::postgresql_base]
-      - recipe[stack_commons::mongodb_standalone]
-      - recipe[stack_commons::memcached]
-      - recipe[stack_commons::varnish]
-      - recipe[stack_commons::rabbitmq]
-      - recipe[stack_commons::redis_single]
-      - recipe[pythonstack::application_python]
+      - recipe[wrapper]
     attributes:
       pythonstack:
         webserver: "nginx"
-        demo:
-          enabled: true
-
-  - name: application-python-apache
-    run_list:
-      - recipe[pythonstack::application_python]
-    attributes:
-      pythonstack:
-        demo:
-          enabled: true
-
-  - name: application-python-nginx
-    run_list:
-      - recipe[pythonstack::application_python]
-    attributes:
-      pythonstack:
-        webserver: "nginx"
-        demo:
-          enabled: true
