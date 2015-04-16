@@ -30,13 +30,7 @@ elsif platform_family?('debian')
 end
 include_recipe 'build-essential'
 include_recipe 'git'
-
-include_recipe 'python::package'
-include_recipe 'python::pip'
-python_pip 'setuptools' do
-  action :upgrade
-  version node['python']['setuptools_version']
-end
+include_recipe 'stack_commons::python'
 
 # set demo if needed
 node.default[stackname][node[stackname]['webserver']]['sites'] = node[stackname]['demo'][node[stackname]['webserver']]['sites'] if node[stackname]['demo']['enabled']
