@@ -28,12 +28,8 @@ if rhel?
   include_recipe 'yum-epel'
   include_recipe 'yum-ius'
   # dependencies for uwsgi recipe (otherwise we have an error on virtualenv install)
-  include_recipe 'python::package'
-  include_recipe 'python::pip'
-  python_pip 'setuptools' do
-    action :upgrade
-  end
 end
+include_recipe 'stack_commons::python'
 
 # Include the necessary recipes.
 %w(
