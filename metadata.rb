@@ -7,6 +7,9 @@ description 'Installs/Configures pythonstack'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version '2.0.1'
 
+depends 'platformstack', '>= 3.1.4'
+depends 'stack_commons', '>= 0.0.50'
+
 depends 'apache2'
 depends 'application'
 depends 'application_python'
@@ -16,10 +19,8 @@ depends 'chef-sugar'
 depends 'git'
 depends 'mysql' # needed in the application_python recipe
 depends 'nginx'
-depends 'platformstack', '>= 3.1.4'
 depends 'python'
 depends 'rackspace_gluster'
-depends 'stack_commons', '>= 0.0.49'
 depends 'uwsgi'
 depends 'yum'
 depends 'yum-epel'
